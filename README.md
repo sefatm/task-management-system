@@ -38,7 +38,7 @@ TaskFlow is a robust 3-tier enterprise role-based task management system. It fea
 | **Frontend** | Angular 13, TypeScript, Bootstrap 5, Bootstrap Icons, RxJS (BehaviorSubject), HTML5, CSS3 |
 | **Database** | MySQL 8.0 (InnoDB engine, foreign keys, self-referential hierarchy, soft-delete flags) |
 | **Deployment** | Netlify (Frontend static SPA), Render / Railway (Backend container), Railway / PlanetScale (Cloud MySQL) |
-| **Documentation** | UML Diagrams (Use Case, Class, ER in SVG & Mermaid), Postman Collection v2.1, Bilingual Presentation & Viva PDFs |
+| **Documentation** | UML Diagrams (Use Case, Class, ER in SVG & Mermaid), Postman Collection v2.1 |
 
 ---
 
