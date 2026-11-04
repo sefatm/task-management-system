@@ -1,0 +1,299 @@
+<!-- Dashboard Header -->
+<div class="welcome-banner mb-4 p-3 p-sm-4 p-lg-5 shadow-sm">
+  <div class="row align-items-center">
+    <div class="col-lg-8">
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+        <span class="badge-role role-{{ session.role }}">
+          <i class="bi bi-shield-fill-check"></i> {{ session.role }} MODE
+        </span>
+        <span class="text-muted small">· {{ today | date:'fullDate' }}</span>
+      </div>
+      <h2 class="welcome-heading fw-bold mb-1">Hello, {{ session.name }}!</h2>
+      <p class="welcome-subtext text-muted mb-0">{{ subtitle }}</p>
+    </div>
+    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+      <!-- Quick Action Buttons -->
+      <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-lg-end">
+        <a *ngIf="session.hasRole('ADMIN', 'MANAGER')" routerLink="/tasks/new" class="btn btn-primary shadow-sm flex-fill flex-sm-grow-0 text-nowrap">
+          <i class="bi bi-plus-lg me-1"></i> Assign Task
+        </a>
+        <a *ngIf="session.hasRole('ADMIN')" routerLink="/users" class="btn btn-outline-secondary flex-fill flex-sm-grow-0 text-nowrap">
+          <i class="bi bi-person-plus me-1"></i> Users
+        </a>
+        <a *ngIf="session.hasRole('EMPLOYEE')" routerLink="/my-tasks" class="btn btn-primary shadow-sm flex-fill flex-sm-grow-0 text-nowrap">
+          <i class="bi bi-arrow-right-circle me-1"></i> Go to My Tasks
+        </a>
+        <a *ngIf="session.hasRole('ADMIN', 'MANAGER')" routerLink="/reports" class="btn btn-outline-secondary flex-fill flex-sm-grow-0 text-nowrap">
+          <i class="bi bi-download me-1"></i> PDF
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading skeleton -->
+<div *ngIf="!stats" class="text-center py-5">
+  <div class="spinner-grow text-primary" role="status"></div>
+  <div class="text-muted mt-2 fw-medium">Loading metrics...</div>
+</div>
+
+<!-- STATS CARDS -->
+<div *ngIf="stats">
+  <!-- ADMIN TOP METRICS -->
+  <div class="row g-3 mb-4" *ngIf="session.hasRole('ADMIN')">
+    <div class="col-md-4">
+      <div class="panel stat-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="stat-label">Active Users</span>
+          <div class="stat-icon-wrap icon-blue">
+            <i class="bi bi-people-fill"></i>
+          </div>
+        </div>
+        <div class="stat-number">{{ stats.totalUsers }}</div>
+        <div class="stat-footer text-muted">
+          <span class="text-success fw-semibold"><i class="bi bi-check-circle"></i> In good standing</span> across company
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="panel stat-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="stat-label">Total Assigned Tasks</span>
+          <div class="stat-icon-wrap icon-purple">
+            <i class="bi bi-clipboard2-data-fill"></i>
+          </div>
+        </div>
+        <div class="stat-number">{{ stats.totalTasks }}</div>
+        <div class="stat-footer text-muted">
+          <span class="fw-semibold">All teams &amp; managers</span> combined
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="panel stat-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="stat-label">Completed Tasks</span>
+          <div class="stat-icon-wrap icon-green">
+            <i class="bi bi-check2-all"></i>
+          </div>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <span class="stat-number text-success">{{ stats.completedTasks }}</span>
+          <span class="badge bg-success-subtle text-success fw-bold">{{ completionPercentage }}% done</span>
+        </div>
+        <div class="progress progress-stat mt-3">
+          <div class="progress-bar bg-success" role="progressbar" [style.width.%]="completionPercentage" [attr.aria-valuenow]="completionPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGER TOP METRICS -->
+  <div class="row g-3 mb-4" *ngIf="session.hasRole('MANAGER')">
+    <div class="col-md-4">
+      <div class="panel stat-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="stat-label">Team Members</span>
+          <div class="stat-icon-wrap icon-blue">
+            <i class="bi bi-person-workspace"></i>
+          </div>
+        </div>
+        <div class="stat-number">{{ stats.teamSize }}</div>
+        <div class="stat-footer text-muted">Employees reporting directly to you</div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="panel stat-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="stat-label">Total Delegated Tasks</span>
+          <div class="stat-icon-wrap icon-purple">
+            <i class="bi bi-list-check"></i>
+          </div>
+        </div>
+        <div class="stat-number">{{ stats.totalTasks || totalMyTasks }}</div>
+        <div class="stat-footer text-muted">
+          <span class="fw-semibold">Assigned by you</span> to your team
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="panel stat-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="stat-label">Team Completed</span>
+          <div class="stat-icon-wrap icon-green">
+            <i class="bi bi-check2-all"></i>
+          </div>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <span class="stat-number text-success">{{ stats.completedTasks || count('DONE') }}</span>
+          <span class="badge bg-success-subtle text-success fw-bold">{{ completionPercentage }}% done</span>
+        </div>
+        <div class="progress progress-stat mt-3">
+          <div class="progress-bar bg-success" role="progressbar" [style.width.%]="completionPercentage" [attr.aria-valuenow]="completionPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE TOP METRICS -->
+  <div class="row g-3 mb-4" *ngIf="session.hasRole('EMPLOYEE')">
+    <div class="col-md-6">
+      <div class="panel stat-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="stat-label">Assigned Workload</span>
+          <div class="stat-icon-wrap icon-purple">
+            <i class="bi bi-card-checklist"></i>
+          </div>
+        </div>
+        <div class="stat-number">{{ stats.totalTasks || totalMyTasks }}</div>
+        <div class="stat-footer text-muted">Total tasks assigned to you</div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel stat-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="stat-label">Completed Velocity</span>
+          <div class="stat-icon-wrap icon-green">
+            <i class="bi bi-check2-all"></i>
+          </div>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <span class="stat-number text-success">{{ stats.completedTasks || count('DONE') }}</span>
+          <span class="badge bg-success-subtle text-success fw-bold">{{ completionPercentage }}% done</span>
+        </div>
+        <div class="progress progress-stat mt-3">
+          <div class="progress-bar bg-success" role="progressbar" [style.width.%]="completionPercentage" [attr.aria-valuenow]="completionPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK PIPELINE BREAKDOWN (PENDING, IN PROGRESS, DONE) - VISIBLE FOR ALL ROLES -->
+  <div class="mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h6 class="fw-bold text-uppercase text-muted small mb-0">
+        <i class="bi bi-kanban me-1.5 text-primary"></i> 
+        {{ session.role === 'ADMIN' ? 'Enterprise Task Pipeline' : (session.role === 'MANAGER' ? 'Team Workload Pipeline' : 'Personal Task Pipeline') }}
+      </h6>
+      <span class="text-muted x-small d-none d-sm-inline">
+        <i class="bi bi-cursor-fill me-1"></i> Click card to filter tasks
+      </span>
+    </div>
+
+    <div class="row g-3">
+      <!-- PENDING -->
+      <div class="col-md-4">
+        <a [routerLink]="session.hasRole('ADMIN', 'MANAGER') ? ['/tasks'] : ['/my-tasks']" 
+           [queryParams]="{ status: 'PENDING' }"
+           class="panel stat-card status-card p-4 border-start-status border-PENDING text-decoration-none d-block">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge-status st-PENDING">
+              <i class="bi bi-hourglass-split"></i> Pending
+            </span>
+            <span class="text-muted small fw-semibold">Count</span>
+          </div>
+          <div class="d-flex align-items-baseline justify-content-between mt-3">
+            <div class="stat-number text-main">{{ count('PENDING') }}</div>
+            <div class="text-muted small">
+              {{ session.role === 'ADMIN' ? 'Waiting across company' : (session.role === 'MANAGER' ? 'Waiting on team' : 'Waiting to start') }}
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- IN PROGRESS -->
+      <div class="col-md-4">
+        <a [routerLink]="session.hasRole('ADMIN', 'MANAGER') ? ['/tasks'] : ['/my-tasks']" 
+           [queryParams]="{ status: 'IN_PROGRESS' }"
+           class="panel stat-card status-card p-4 border-start-status border-IN_PROGRESS text-decoration-none d-block">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge-status st-IN_PROGRESS">
+              <i class="bi bi-arrow-repeat"></i> In Progress
+            </span>
+            <span class="text-muted small fw-semibold">Count</span>
+          </div>
+          <div class="d-flex align-items-baseline justify-content-between mt-3">
+            <div class="stat-number text-main">{{ count('IN_PROGRESS') }}</div>
+            <div class="text-muted small">
+              {{ session.role === 'ADMIN' ? 'Active enterprise work' : (session.role === 'MANAGER' ? 'Team actively working' : 'Currently in progress') }}
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- DONE -->
+      <div class="col-md-4">
+        <a [routerLink]="session.hasRole('ADMIN', 'MANAGER') ? ['/tasks'] : ['/my-tasks']" 
+           [queryParams]="{ status: 'DONE' }"
+           class="panel stat-card status-card p-4 border-start-status border-DONE text-decoration-none d-block">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge-status st-DONE">
+              <i class="bi bi-check2-circle"></i> Completed
+            </span>
+            <span class="text-muted small fw-semibold">Count</span>
+          </div>
+          <div class="d-flex align-items-baseline justify-content-between mt-3">
+            <div class="stat-number text-success">{{ count('DONE') }}</div>
+            <div class="text-muted small">
+              Successfully closed
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick shortcuts section -->
+  <div class="panel p-4 mt-2 shadow-sm border-0">
+    <h6 class="fw-bold text-uppercase text-muted small mb-3">
+      <i class="bi bi-speedometer2 me-1"></i> Quick Navigations
+    </h6>
+    <div class="row g-3">
+      <div class="col-md-4" *ngIf="session.hasRole('ADMIN')">
+        <a routerLink="/users" class="shortcut-box d-flex align-items-center gap-3 p-3 text-decoration-none">
+          <div class="shortcut-icon icon-blue"><i class="bi bi-people"></i></div>
+          <div class="flex-grow-1">
+            <div class="fw-bold text-main">Manage Users</div>
+            <div class="text-muted small">Create, edit, or adjust roles</div>
+          </div>
+          <i class="bi bi-chevron-right text-muted small"></i>
+        </a>
+      </div>
+      <div class="col-md-4" *ngIf="session.hasRole('ADMIN', 'MANAGER')">
+        <a routerLink="/tasks" class="shortcut-box d-flex align-items-center gap-3 p-3 text-decoration-none">
+          <div class="shortcut-icon icon-purple"><i class="bi bi-list-task"></i></div>
+          <div class="flex-grow-1">
+            <div class="fw-bold text-main">Task Directory</div>
+            <div class="text-muted small">Filter by status, priority, or assignee</div>
+          </div>
+          <i class="bi bi-chevron-right text-muted small"></i>
+        </a>
+      </div>
+      <div class="col-md-4" *ngIf="session.hasRole('ADMIN', 'MANAGER')">
+        <a routerLink="/reports" class="shortcut-box d-flex align-items-center gap-3 p-3 text-decoration-none">
+          <div class="shortcut-icon icon-green"><i class="bi bi-file-earmark-pdf"></i></div>
+          <div class="flex-grow-1">
+            <div class="fw-bold text-main">Executive PDF</div>
+            <div class="text-muted small">Export full report in one click</div>
+          </div>
+          <i class="bi bi-chevron-right text-muted small"></i>
+        </a>
+      </div>
+      <div class="col-md-4" *ngIf="session.hasRole('EMPLOYEE')">
+        <a routerLink="/my-tasks" class="shortcut-box d-flex align-items-center gap-3 p-3 text-decoration-none">
+          <div class="shortcut-icon icon-purple"><i class="bi bi-check2-circle"></i></div>
+          <div class="flex-grow-1">
+            <div class="fw-bold text-main">Action Items</div>
+            <div class="text-muted small">Advance progress from Pending to Done</div>
+          </div>
+          <i class="bi bi-chevron-right text-muted small"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

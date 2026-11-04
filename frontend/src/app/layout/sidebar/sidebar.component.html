@@ -1,0 +1,103 @@
+<aside class="app-sidebar shadow-sm" [class.collapsed]="layout.isCollapsed">
+  <!-- Brand / Header -->
+  <div class="sidebar-header d-flex align-items-center justify-content-between">
+    <a class="sidebar-brand text-decoration-none" routerLink="/dashboard">
+      <div class="brand-icon">
+        <i class="bi bi-kanban-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!layout.isCollapsed">
+        <span class="brand-title">TaskFlow</span>
+        <span class="brand-subtitle">Enterprise Suite</span>
+      </div>
+    </a>
+    <!-- Toggle Button on Sidebar Header (Shows Close 'X' on mobile) -->
+    <button class="btn-sidebar-toggle" type="button" (click)="layout.toggleSidebar()" [title]="layout.isCollapsed ? 'Expand sidebar' : 'Close sidebar'">
+      <i class="bi d-lg-none bi-x-lg"></i>
+      <i class="bi d-none d-lg-inline" [ngClass]="layout.isCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+    </button>
+  </div>
+
+  <!-- Navigation Menu Section -->
+  <div class="sidebar-nav-container">
+    <div class="nav-section-title" *ngIf="!layout.isCollapsed">
+      MAIN MENU
+    </div>
+
+    <ul class="nav flex-column sidebar-nav gap-1">
+      <!-- 1. Dashboard -->
+      <li class="nav-item">
+        <a class="nav-link sidebar-link" routerLink="/dashboard" routerLinkActive="active" 
+           [title]="layout.isCollapsed ? 'Dashboard' : ''">
+          <i class="bi bi-grid-1x2-fill nav-icon"></i>
+          <span class="nav-text" *ngIf="!layout.isCollapsed">Dashboard</span>
+        </a>
+      </li>
+
+      <!-- 2. Users (ADMIN only) -->
+      <li class="nav-item" *ngIf="session.hasRole('ADMIN')">
+        <a class="nav-link sidebar-link" routerLink="/users" routerLinkActive="active"
+           [title]="layout.isCollapsed ? 'Users' : ''">
+          <i class="bi bi-people-fill nav-icon text-indigo"></i>
+          <span class="nav-text" *ngIf="!layout.isCollapsed">Users</span>
+          <span class="badge bg-danger-subtle text-danger ms-auto rounded-pill" *ngIf="!layout.isCollapsed">Admin</span>
+        </a>
+      </li>
+
+      <!-- 3. Tasks (ADMIN & MANAGER) -->
+      <li class="nav-item" *ngIf="session.hasRole('ADMIN', 'MANAGER')">
+        <a class="nav-link sidebar-link" routerLink="/tasks" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+           [title]="layout.isCollapsed ? 'Tasks' : ''">
+          <i class="bi bi-list-check nav-icon text-primary"></i>
+          <span class="nav-text" *ngIf="!layout.isCollapsed">Tasks</span>
+        </a>
+      </li>
+
+      <!-- 4. Assign Task (ADMIN & MANAGER) -->
+      <li class="nav-item" *ngIf="session.hasRole('ADMIN', 'MANAGER')">
+        <a class="nav-link sidebar-link" routerLink="/tasks/new" routerLinkActive="active"
+           [title]="layout.isCollapsed ? 'Assign Task' : ''">
+          <i class="bi bi-plus-circle-fill nav-icon text-cyan"></i>
+          <span class="nav-text" *ngIf="!layout.isCollapsed">Assign Task</span>
+        </a>
+      </li>
+
+      <!-- 5. My Tasks (EMPLOYEE) -->
+      <li class="nav-item" *ngIf="session.hasRole('EMPLOYEE')">
+        <a class="nav-link sidebar-link" routerLink="/my-tasks" routerLinkActive="active"
+           [title]="layout.isCollapsed ? 'My Tasks' : ''">
+          <i class="bi bi-check2-circle nav-icon text-success"></i>
+          <span class="nav-text" *ngIf="!layout.isCollapsed">My Tasks</span>
+        </a>
+      </li>
+
+      <!-- 6. Reports (ADMIN & MANAGER) -->
+      <li class="nav-item" *ngIf="session.hasRole('ADMIN', 'MANAGER')">
+        <a class="nav-link sidebar-link" routerLink="/reports" routerLinkActive="active"
+           [title]="layout.isCollapsed ? 'Reports' : ''">
+          <i class="bi bi-file-earmark-pdf-fill nav-icon text-danger"></i>
+          <span class="nav-text" *ngIf="!layout.isCollapsed">Reports</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Sidebar Footer / User Profile summary -->
+  <div class="sidebar-footer">
+    <div class="role-card p-3 shadow-2xs" *ngIf="!layout.isCollapsed">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <div class="status-indicator"></div>
+        <span class="badge-role py-0 px-2" [ngClass]="'role-' + (session.role || '')" style="font-size: 0.65rem;">
+          {{ session.role }} MODE
+        </span>
+      </div>
+      <div class="text-truncate fw-bold text-dark small">{{ session.name }}</div>
+      <div class="text-truncate text-muted" style="font-size: 0.725rem;">{{ session.email }}</div>
+    </div>
+    <div class="text-center p-2" *ngIf="layout.isCollapsed">
+      <div class="status-indicator mx-auto" [title]="session.name + (session.role ? ' (' + session.role + ')' : '')"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Backdrop on mobile screens to tap and close sidebar drawer -->
+<div class="sidebar-backdrop d-lg-none" *ngIf="!layout.isCollapsed" (click)="layout.toggleSidebar()"></div>

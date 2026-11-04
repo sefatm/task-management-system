@@ -1,0 +1,230 @@
+/* ==========================================================================
+   Task Directory Modern Premium Design
+   ========================================================================== */
+
+.page-title {
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+/* Status Segmented Tabs */
+.status-tab-group {
+  display: flex;
+  background: #f1f5f9;
+  padding: 0.3rem;
+  border-radius: 12px;
+  gap: 0.25rem;
+  overflow-x: auto;
+}
+
+.status-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.status-tab:hover {
+  color: #0f172a;
+}
+
+.status-tab.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-pending { background-color: #f59e0b; }
+.dot-inprogress { background-color: #0284c7; box-shadow: 0 0 6px #0284c7; }
+.dot-done { background-color: #10b981; }
+
+.tab-badge {
+  background: rgba(15, 23, 42, 0.06);
+  color: #475569;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 20px;
+}
+
+.status-tab.active .tab-badge {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+/* Filter Selects */
+.filter-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.modern-select {
+  padding: 0.45rem 2.25rem 0.45rem 0.85rem;
+  height: 38px;
+  font-size: 0.84rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  font-weight: 500;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.btn-reset {
+  height: 38px;
+  width: 38px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-reset:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Task Cards */
+.task-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border-left: 5px solid transparent !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.1) !important;
+}
+
+.border-status-PENDING {
+  border-left-color: #f59e0b !important;
+}
+
+.border-status-IN_PROGRESS {
+  border-left-color: #0284c7 !important;
+}
+
+.border-status-DONE {
+  border-left-color: #10b981 !important;
+  opacity: 0.88;
+}
+
+.task-status-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.icon-status-PENDING {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.icon-status-IN_PROGRESS {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.icon-status-DONE {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.task-title {
+  color: #0f172a;
+  font-size: 1.05rem;
+  letter-spacing: -0.015em;
+}
+
+.task-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  max-width: 680px;
+}
+
+/* Meta Row */
+.meta-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.meta-avatar-assignee {
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+}
+
+.badge-overdue {
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Actions */
+.btn-action-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-action-icon:hover {
+  transform: translateY(-1px);
+}
+
+/* Empty State */
+.empty-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 1.75rem;
+}

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+target/
+bin/
+.env
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+*.log
+.angular/
+

@@ -1,0 +1,165 @@
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">User Directory</h3>
+    <p class="text-muted small mb-0">Create employee accounts, manage permissions, and assign reporting managers.</p>
+  </div>
+  <button class="btn btn-primary" (click)="openForm(null)">
+    <i class="bi bi-person-plus-fill"></i> Add New User
+  </button>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="panel p-3 mb-4">
+  <div class="row align-items-center g-2">
+    <div class="col-md-6 col-lg-5">
+      <div class="input-icon-wrap">
+        <i class="bi bi-search"></i>
+        <input class="form-control" placeholder="Search by name or email..." 
+               (input)="search$.next($any($event.target).value)">
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-7 text-md-end text-muted small">
+      <span *ngIf="data">Showing <strong>{{ data.content.length }}</strong> of <strong>{{ data.totalElements }}</strong> registered users</span>
+    </div>
+  </div>
+</div>
+
+<!-- Users Table Panel -->
+<div class="panel shadow-sm table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th style="width: 35%;">User</th>
+        <th style="width: 20%;">Role</th>
+        <th style="width: 25%;">Manager</th>
+        <th class="text-end" style="width: 20%;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of data?.content">
+        <td>
+          <div class="d-flex align-items-center gap-3">
+            <div class="user-avatar">
+              {{ u.fullName ? u.fullName.charAt(0).toUpperCase() : 'U' }}
+            </div>
+            <div>
+              <div class="fw-bold text-main">{{ u.fullName }}</div>
+              <div class="text-muted small">{{ u.email }}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="badge-role role-{{ u.role }}">
+            {{ u.role }}
+          </span>
+        </td>
+        <td>
+          <div *ngIf="u.managerName" class="d-flex align-items-center gap-1 text-secondary small">
+            <i class="bi bi-diagram-2 text-primary"></i>
+            <span class="fw-medium">{{ u.managerName }}</span>
+          </div>
+          <span *ngIf="!u.managerName" class="text-muted small">—</span>
+        </td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-secondary me-2" (click)="openForm(u)" title="Edit user">
+            <i class="bi bi-pencil"></i> Edit
+          </button>
+          <button class="btn btn-sm btn-outline-danger" (click)="remove(u)" title="Soft delete">
+            <i class="bi bi-trash"></i> Delete
+          </button>
+        </td>
+      </tr>
+      <tr *ngIf="data && data.content.length === 0">
+        <td colspan="4" class="text-center py-5">
+          <div class="text-muted mb-2"><i class="bi bi-search fs-3"></i></div>
+          <div class="fw-semibold">No users found</div>
+          <div class="text-muted small">Try adjusting your search criteria</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination Controls -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3" *ngIf="data && data.totalPages > 1">
+  <span class="text-muted small">
+    Page <strong>{{ data.number + 1 }}</strong> of <strong>{{ data.totalPages }}</strong> ({{ data.totalElements }} users)
+  </span>
+  <div class="btn-group">
+    <button class="btn btn-outline-secondary btn-sm" [disabled]="data.number === 0" (click)="go(data.number - 1)">
+      <i class="bi bi-chevron-left"></i> Previous
+    </button>
+    <button class="btn btn-outline-secondary btn-sm" [disabled]="data.number + 1 >= data.totalPages" (click)="go(data.number + 1)">
+      Next <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Add / Edit User Modal -->
+<div class="modal-backdrop-custom" *ngIf="showForm" (click)="closeForm()">
+  <div class="panel user-modal p-4 p-sm-5" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h5 class="fw-bold mb-0">{{ editing ? 'Edit User Details' : 'Create New Account' }}</h5>
+        <div class="text-muted small">{{ editing ? 'Update role or credentials' : 'Add team member to workspace' }}</div>
+      </div>
+      <button type="button" class="btn-close" (click)="closeForm()" aria-label="Close"></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <div class="input-icon-wrap">
+          <i class="bi bi-person"></i>
+          <input class="form-control" formControlName="fullName" placeholder="John Doe" [class.is-invalid]="invalid('fullName')">
+        </div>
+        <div class="invalid-feedback d-block" *ngIf="invalid('fullName')">Full name is required (max 100 characters).</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Work Email</label>
+        <div class="input-icon-wrap">
+          <i class="bi bi-envelope"></i>
+          <input type="email" class="form-control" formControlName="email" placeholder="john@company.com" [class.is-invalid]="invalid('email')">
+        </div>
+        <div class="invalid-feedback d-block" *ngIf="invalid('email')">Enter a valid email address.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">
+          Password <span class="text-muted fw-normal" *ngIf="editing">(leave empty to retain current)</span>
+        </label>
+        <div class="input-icon-wrap">
+          <i class="bi bi-lock"></i>
+          <input type="password" class="form-control" formControlName="password" placeholder="Min 6 characters" autocomplete="new-password" [class.is-invalid]="invalid('password')">
+        </div>
+        <div class="invalid-feedback d-block" *ngIf="invalid('password')">Password must be between 6 and 100 characters.</div>
+      </div>
+
+      <div class="row g-2 mb-3">
+        <div class="col-12" [ngClass]="form.value.role === 'EMPLOYEE' ? 'col-sm-6' : 'col-12'">
+          <label class="form-label">System Role</label>
+          <select class="form-select" formControlName="role">
+            <option *ngFor="let r of roles" [value]="r">{{ r | label }}</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-sm-6" *ngIf="form.value.role === 'EMPLOYEE'">
+          <label class="form-label">Reporting Manager</label>
+          <select class="form-select" formControlName="managerId">
+            <option [ngValue]="null">None (Unassigned)</option>
+            <option *ngFor="let m of managers" [ngValue]="m.id">{{ m.fullName }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+          <span>{{ saving ? 'Saving…' : (editing ? 'Update User' : 'Create User') }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

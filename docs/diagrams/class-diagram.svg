@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="100%" height="100%" style="background:#ffffff; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+  <defs>
+    <filter id="cShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1d2740">Backend Architecture &amp; Class Diagram (Spring Boot 3)</text>
+
+  <!-- 1. CONTROLLERS LAYER -->
+  <g transform="translate(40, 60)">
+    <rect x="0" y="0" width="920" height="110" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-dasharray="4,4"/>
+    <text x="15" y="20" font-size="12" font-weight="700" fill="#475569">REST CONTROLLERS (@RestController + @PreAuthorize)</text>
+
+    <!-- AuthController -->
+    <g transform="translate(15, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="165" height="65" rx="6" fill="#ffffff" stroke="#0e7c86" stroke-width="1.5"/>
+      <rect x="0" y="0" width="165" height="24" rx="6" fill="#0e7c86"/>
+      <text x="82" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">AuthController</text>
+      <text x="8" y="42" font-size="10" fill="#334155">+ login()</text>
+      <text x="8" y="56" font-size="10" fill="#334155">+ register()</text>
+    </g>
+
+    <!-- UserController -->
+    <g transform="translate(195, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="165" height="65" rx="6" fill="#ffffff" stroke="#0e7c86" stroke-width="1.5"/>
+      <rect x="0" y="0" width="165" height="24" rx="6" fill="#0e7c86"/>
+      <text x="82" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">UserController</text>
+      <text x="8" y="42" font-size="10" fill="#334155">+ list(), get(), create()</text>
+      <text x="8" y="56" font-size="10" fill="#334155">+ update(), delete()</text>
+    </g>
+
+    <!-- TaskController -->
+    <g transform="translate(375, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="175" height="65" rx="6" fill="#ffffff" stroke="#0e7c86" stroke-width="1.5"/>
+      <rect x="0" y="0" width="175" height="24" rx="6" fill="#0e7c86"/>
+      <text x="87" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">TaskController</text>
+      <text x="8" y="42" font-size="10" fill="#334155">+ list(), get(), create()</text>
+      <text x="8" y="56" font-size="10" fill="#334155">+ update(), updateStatus()</text>
+    </g>
+
+    <!-- DashboardController -->
+    <g transform="translate(565, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="165" height="65" rx="6" fill="#ffffff" stroke="#0e7c86" stroke-width="1.5"/>
+      <rect x="0" y="0" width="165" height="24" rx="6" fill="#0e7c86"/>
+      <text x="82" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">DashboardController</text>
+      <text x="8" y="48" font-size="10" fill="#334155">+ stats()</text>
+    </g>
+
+    <!-- ReportController -->
+    <g transform="translate(745, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="160" height="65" rx="6" fill="#ffffff" stroke="#0e7c86" stroke-width="1.5"/>
+      <rect x="0" y="0" width="160" height="24" rx="6" fill="#0e7c86"/>
+      <text x="80" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">ReportController</text>
+      <text x="8" y="48" font-size="10" fill="#334155">+ tasksPdf()</text>
+    </g>
+  </g>
+
+  <!-- 2. SERVICE LAYER -->
+  <g transform="translate(40, 195)">
+    <rect x="0" y="0" width="920" height="115" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-dasharray="4,4"/>
+    <text x="15" y="20" font-size="12" font-weight="700" fill="#475569">BUSINESS SERVICES (@Service + Transactional + Business RBAC)</text>
+
+    <!-- AuthService -->
+    <g transform="translate(15, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="165" height="70" rx="6" fill="#ffffff" stroke="#1d2740" stroke-width="1.5"/>
+      <rect x="0" y="0" width="165" height="24" rx="6" fill="#1d2740"/>
+      <text x="82" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">AuthService</text>
+      <text x="8" y="44" font-size="10" fill="#334155">+ login(req): LoginResp</text>
+      <text x="8" y="60" font-size="9" fill="#64748b">uses AuthMgr &amp; JwtUtil</text>
+    </g>
+
+    <!-- UserService -->
+    <g transform="translate(195, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="165" height="70" rx="6" fill="#ffffff" stroke="#1d2740" stroke-width="1.5"/>
+      <rect x="0" y="0" width="165" height="24" rx="6" fill="#1d2740"/>
+      <text x="82" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">UserService</text>
+      <text x="8" y="44" font-size="10" fill="#334155">+ list(), get(), create()</text>
+      <text x="8" y="60" font-size="10" fill="#334155">+ update(), delete()</text>
+    </g>
+
+    <!-- TaskService -->
+    <g transform="translate(375, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="175" height="70" rx="6" fill="#ffffff" stroke="#1d2740" stroke-width="1.5"/>
+      <rect x="0" y="0" width="175" height="24" rx="6" fill="#1d2740"/>
+      <text x="87" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">TaskService</text>
+      <text x="8" y="44" font-size="10" fill="#334155">+ create(), list(), update()</text>
+      <text x="8" y="60" font-size="10" fill="#334155">+ updateStatus(), assignees()</text>
+    </g>
+
+    <!-- DashboardService -->
+    <g transform="translate(565, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="165" height="70" rx="6" fill="#ffffff" stroke="#1d2740" stroke-width="1.5"/>
+      <rect x="0" y="0" width="165" height="24" rx="6" fill="#1d2740"/>
+      <text x="82" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">DashboardService</text>
+      <text x="8" y="44" font-size="10" fill="#334155">+ stats(): DashboardStats</text>
+      <text x="8" y="60" font-size="9" fill="#64748b">aggregates by role</text>
+    </g>
+
+    <!-- ReportService -->
+    <g transform="translate(745, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="160" height="70" rx="6" fill="#ffffff" stroke="#1d2740" stroke-width="1.5"/>
+      <rect x="0" y="0" width="160" height="24" rx="6" fill="#1d2740"/>
+      <text x="80" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#ffffff">ReportService</text>
+      <text x="8" y="44" font-size="10" fill="#334155">+ tasksPdf(): byte[]</text>
+      <text x="8" y="60" font-size="9" fill="#64748b">OpenPDF document table</text>
+    </g>
+  </g>
+
+  <!-- 3. REPOSITORY LAYER -->
+  <g transform="translate(180, 335)">
+    <rect x="0" y="0" width="640" height="90" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-dasharray="4,4"/>
+    <text x="15" y="20" font-size="12" font-weight="700" fill="#475569">DATA ACCESS LAYER (Spring Data JPA Repositories)</text>
+
+    <!-- UserRepository -->
+    <g transform="translate(30, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="260" height="48" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <rect x="0" y="0" width="260" height="20" rx="6" fill="#2563eb"/>
+      <text x="130" y="14" text-anchor="middle" font-size="10.5" font-weight="600" fill="#ffffff">&lt;&lt;interface&gt;&gt; UserRepository</text>
+      <text x="8" y="36" font-size="9.5" fill="#334155">findByEmail, search, countByActiveTrue...</text>
+    </g>
+
+    <!-- TaskRepository -->
+    <g transform="translate(340, 30)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="260" height="48" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <rect x="0" y="0" width="260" height="20" rx="6" fill="#2563eb"/>
+      <text x="130" y="14" text-anchor="middle" font-size="10.5" font-weight="600" fill="#ffffff">&lt;&lt;interface&gt;&gt; TaskRepository</text>
+      <text x="8" y="36" font-size="9.5" fill="#334155">JpaSpecificationExecutor, countByStatus...</text>
+    </g>
+  </g>
+
+  <!-- 4. DOMAIN ENTITIES & ENUMS -->
+  <g transform="translate(40, 450)">
+    <rect x="0" y="0" width="920" height="225" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-dasharray="4,4"/>
+    <text x="15" y="20" font-size="12" font-weight="700" fill="#475569">DOMAIN ENTITIES &amp; ENUMS (@Entity / Hibernate)</text>
+
+    <!-- User Entity -->
+    <g transform="translate(30, 35)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="240" height="170" rx="6" fill="#ffffff" stroke="#1d2740" stroke-width="1.5"/>
+      <rect x="0" y="0" width="240" height="26" rx="6" fill="#1d2740"/>
+      <text x="120" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">User</text>
+      <text x="10" y="46" font-size="10.5" fill="#334155">- id: Long</text>
+      <text x="10" y="64" font-size="10.5" fill="#334155">- fullName: String</text>
+      <text x="10" y="82" font-size="10.5" fill="#334155">- email: String</text>
+      <text x="10" y="100" font-size="10.5" fill="#334155">- password: String (BCrypt)</text>
+      <text x="10" y="118" font-size="10.5" fill="#334155">- role: Role</text>
+      <text x="10" y="136" font-size="10.5" fill="#334155">- manager: User (self-ref)</text>
+      <text x="10" y="154" font-size="10.5" fill="#334155">- active: boolean</text>
+    </g>
+
+    <!-- Task Entity -->
+    <g transform="translate(340, 35)" filter="url(#cShadow)">
+      <rect x="0" y="0" width="250" height="170" rx="6" fill="#ffffff" stroke="#0e7c86" stroke-width="1.5"/>
+      <rect x="0" y="0" width="250" height="26" rx="6" fill="#0e7c86"/>
+      <text x="125" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Task</text>
+      <text x="10" y="46" font-size="10.5" fill="#334155">- id: Long</text>
+      <text x="10" y="64" font-size="10.5" fill="#334155">- title: String</text>
+      <text x="10" y="82" font-size="10.5" fill="#334155">- description: String</text>
+      <text x="10" y="100" font-size="10.5" fill="#334155">- status: TaskStatus</text>
+      <text x="10" y="118" font-size="10.5" fill="#334155">- priority: Priority</text>
+      <text x="10" y="136" font-size="10.5" fill="#334155">- deadline: LocalDate</text>
+      <text x="10" y="154" font-size="10.5" fill="#334155">- assignedTo: User / assignedBy: User</text>
+    </g>
+
+    <!-- Enums -->
+    <g transform="translate(650, 35)" filter="url(#cShadow)">
+      <!-- Role -->
+      <rect x="0" y="0" width="230" height="50" rx="6" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+      <text x="10" y="18" font-size="10.5" font-weight="700" fill="#1d2740">&lt;&lt;enum&gt;&gt; Role</text>
+      <text x="10" y="38" font-size="10" fill="#64748b">ADMIN | MANAGER | EMPLOYEE</text>
+
+      <!-- TaskStatus -->
+      <rect x="0" y="60" width="230" height="50" rx="6" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+      <text x="10" y="78" font-size="10.5" font-weight="700" fill="#1d2740">&lt;&lt;enum&gt;&gt; TaskStatus</text>
+      <text x="10" y="98" font-size="10" fill="#64748b">PENDING | IN_PROGRESS | DONE</text>
+
+      <!-- Priority -->
+      <rect x="0" y="120" width="230" height="50" rx="6" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+      <text x="10" y="138" font-size="10.5" font-weight="700" fill="#1d2740">&lt;&lt;enum&gt;&gt; Priority</text>
+      <text x="10" y="158" font-size="10" fill="#64748b">LOW | MEDIUM | HIGH</text>
+    </g>
+  </g>
+
+  <!-- Flow Arrows connecting layers -->
+  <line x1="500" y1="170" x2="500" y2="195" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="500" y1="310" x2="500" y2="335" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="500" y1="425" x2="500" y2="450" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+</svg>

@@ -1,0 +1,170 @@
+<div class="login-wrapper">
+  <!-- Subtle ambient background glows -->
+  <div class="ambient-glow glow-top"></div>
+  <div class="ambient-glow glow-bottom"></div>
+
+  <div class="login-container">
+    <div class="row g-0 align-items-stretch login-card-row">
+      
+      <!-- Brand & Clean Visual Highlights -->
+      <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-between p-5 brand-column">
+        <!-- Logo -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="brand-logo-icon">
+            <i class="bi bi-kanban-fill"></i>
+          </div>
+          <div>
+            <div class="brand-name">TaskFlow</div>
+            <div class="brand-edition">Enterprise Suite</div>
+          </div>
+        </div>
+
+        <!-- Hero & Minimalist Feature Cards -->
+        <div class="my-auto py-4">
+          <h1 class="hero-headline">
+            Simplify work.<br>
+            <span class="gradient-text">Execute with precision.</span>
+          </h1>
+          <p class="hero-subtext">
+            Enterprise task management with role-based workflows and real-time oversight.
+          </p>
+
+          <div class="features-stack">
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <div class="feature-content">
+                <div class="feature-title">Role-Based Security</div>
+                <div class="feature-desc">Dedicated portals for Admins, Managers, and Employees.</div>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-kanban"></i>
+              </div>
+              <div class="feature-content">
+                <div class="feature-title">Smart Task Tracking</div>
+                <div class="feature-desc">Real-time status updates from Pending to Completion.</div>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-file-earmark-pdf"></i>
+              </div>
+              <div class="feature-content">
+                <div class="feature-title">Executive Reports</div>
+                <div class="feature-desc">Generate instant, audit-ready PDF performance reports.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="brand-footer text-muted small">
+          <span>&copy; 2026 TaskFlow. All rights reserved.</span>
+        </div>
+      </div>
+
+      <!-- Sign-In Form -->
+      <div class="col-lg-6 d-flex align-items-center justify-content-center p-4 p-sm-5 form-column">
+        <div class="form-container w-100">
+
+          <!-- Mobile Brand Logo (Visible on mobile only) -->
+          <div class="d-lg-none text-center mb-4">
+            <div class="brand-logo-icon mx-auto mb-2">
+              <i class="bi bi-kanban-fill"></i>
+            </div>
+            <h4 class="fw-bold text-white mb-0">TaskFlow</h4>
+            <div class="text-muted small">Enterprise Suite</div>
+          </div>
+
+          <!-- Form Header -->
+          <div class="mb-4">
+            <h2 class="form-title">Welcome back</h2>
+            <p class="form-subtitle">Sign in to your workspace</p>
+          </div>
+
+          <!-- Sign-In Form -->
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="input-label" for="login-email">Email Address</label>
+              <div class="input-wrap">
+                <i class="bi bi-envelope input-icon"></i>
+                <input id="login-email" 
+                       type="email" 
+                       class="form-control modern-input" 
+                       formControlName="email"
+                       placeholder="you@company.com" 
+                       autocomplete="username"
+                       [class.is-invalid]="invalid('email')">
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="invalid('email')">
+                Please enter a valid email address.
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label class="input-label" for="login-password">Password</label>
+              <div class="input-wrap">
+                <i class="bi bi-lock input-icon"></i>
+                <input id="login-password" 
+                       [type]="showPassword ? 'text' : 'password'" 
+                       class="form-control modern-input"
+                       formControlName="password" 
+                       placeholder="••••••••"
+                       autocomplete="current-password" 
+                       [class.is-invalid]="invalid('password')">
+                <button type="button" class="btn-toggle-eye" (click)="showPassword = !showPassword" tabindex="-1">
+                  <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="invalid('password')">
+                Password is required.
+              </div>
+            </div>
+
+            <!-- Remember Me -->
+            <div class="mb-4 d-flex align-items-center justify-content-between">
+              <label class="custom-check-wrap">
+                <input type="checkbox" [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}">
+                <span class="checkmark"></span>
+                <span class="check-label">Remember me</span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-submit w-100" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              <span>{{ loading ? 'Signing in…' : 'Sign In' }}</span>
+              <i class="bi bi-arrow-right ms-2" *ngIf="!loading"></i>
+            </button>
+          </form>
+
+          <!-- 1-Click Demo Profiles -->
+          <div class="demo-selector mt-4">
+            <div class="demo-selector-label">
+              <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Demo Accounts
+            </div>
+            <div class="demo-pill-group">
+              <button type="button" 
+                      *ngFor="let r of demoRoles" 
+                      class="demo-pill" 
+                      [class.active]="selectedRole.role === r.role"
+                      (click)="selectRole(r)">
+                <span class="role-dot" [ngClass]="'dot-' + r.role"></span>
+                <span>{{ r.label }}</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

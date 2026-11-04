@@ -1,0 +1,277 @@
+<!-- Report Page Header -->
+<div class="welcome-banner mb-4 p-4 p-lg-5 shadow-sm">
+  <div class="row align-items-center">
+    <div class="col-lg-7">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge-role role-{{ session.role }}">
+          <i class="bi bi-shield-fill-check"></i> {{ session.role }} AUDIT MODE
+        </span>
+        <span class="badge bg-light text-secondary border px-2 py-0.5 x-small">
+          <i class="bi bi-table me-1"></i> 9 Field Columns
+        </span>
+      </div>
+      <h2 class="welcome-heading fw-bold mb-1">Executive Audit &amp; Reports</h2>
+      <p class="welcome-subtext text-muted mb-0">
+        {{ session.hasRole('ADMIN') 
+            ? 'Complete company-wide task audit registry with live filters and official A4 PDF export.' 
+            : 'Department audit registry for tasks delegated to your direct team members.' }}
+      </p>
+    </div>
+
+    <!-- Download PDF Action Button -->
+    <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+      <div class="d-inline-flex flex-column align-items-lg-end gap-1">
+        <button class="btn btn-primary btn-lg shadow-sm d-inline-flex align-items-center gap-2 px-4 py-2.5 rounded-pill" 
+                (click)="download()" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
+          <i *ngIf="!loading" class="bi bi-file-earmark-pdf-fill fs-5"></i>
+          <span class="fw-bold">{{ loading ? 'Generating PDF…' : 'Download Task Report (PDF)' }}</span>
+        </button>
+        <span class="text-muted x-small">Includes Assign Date, Deadline &amp; Complete Date</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KPI SUMMARY METRICS -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-sm-6">
+    <div class="panel stat-card p-3 p-md-4">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="stat-label">Total Audit Tasks</span>
+        <div class="stat-icon-wrap icon-purple">
+          <i class="bi bi-clipboard2-data"></i>
+        </div>
+      </div>
+      <div class="stat-number">{{ tasks.length }}</div>
+      <div class="stat-footer text-muted x-small mt-2">
+        <span class="fw-semibold">Registered in system</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-6">
+    <div class="panel stat-card p-3 p-md-4">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="stat-label">Completed Tasks</span>
+        <div class="stat-icon-wrap icon-green">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+      </div>
+      <div class="d-flex align-items-baseline gap-2">
+        <span class="stat-number text-success">{{ doneCount }}</span>
+        <span class="badge bg-success-subtle text-success fw-bold">{{ completionPercentage }}% done</span>
+      </div>
+      <div class="progress progress-stat mt-2">
+        <div class="progress-bar bg-success" role="progressbar" [style.width.%]="completionPercentage"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-6">
+    <div class="panel stat-card p-3 p-md-4">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="stat-label">In Progress Work</span>
+        <div class="stat-icon-wrap icon-blue">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+      </div>
+      <div class="stat-number text-primary">{{ inProgressCount }}</div>
+      <div class="stat-footer text-muted x-small mt-2">
+        <span>Active development</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-6">
+    <div class="panel stat-card p-3 p-md-4">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="stat-label">Pending Initiation</span>
+        <div class="stat-icon-wrap icon-amber">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+      </div>
+      <div class="stat-number text-warning">{{ pendingCount }}</div>
+      <div class="stat-footer text-muted x-small mt-2">
+        <span>Waiting to be started</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIT TABLE PANEL -->
+<div class="panel p-0 overflow-hidden shadow-sm border-0">
+  
+  <!-- Search & Live Filter Toolbar -->
+  <div class="p-3 p-md-4 border-bottom bg-white">
+    <div class="row g-2 align-items-center">
+      <!-- Search Input -->
+      <div class="col-lg-5 col-md-12">
+        <div class="input-icon-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" class="form-control" [(ngModel)]="searchQuery" (input)="page = 0; layout.setSearchQuery(searchQuery)"
+                 placeholder="Search by task title, description, assignee, or manager...">
+        </div>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="col-lg-3 col-sm-6">
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="page = 0">
+          <option value="">All Statuses (Pending, In Progress, Done)</option>
+          <option *ngFor="let s of statuses" [value]="s">{{ s | label }}</option>
+        </select>
+      </div>
+
+      <!-- Priority Filter -->
+      <div class="col-lg-2 col-sm-6">
+        <select class="form-select" [(ngModel)]="selectedPriority" (change)="page = 0">
+          <option value="">All Priorities</option>
+          <option *ngFor="let p of priorities" [value]="p">{{ p | label }}</option>
+        </select>
+      </div>
+
+      <!-- Reset Filter Button -->
+      <div class="col-lg-2 col-12 text-end">
+        <button class="btn btn-outline-secondary w-100" (click)="resetFilters()" title="Reset Filters">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Skeleton -->
+  <div *ngIf="loadingTable" class="text-center py-5">
+    <div class="spinner-grow text-primary" role="status"></div>
+    <div class="text-muted mt-2 small">Loading audit report records…</div>
+  </div>
+
+  <!-- Live On-Screen Manual Report Table -->
+  <div class="table-responsive" *ngIf="!loadingTable">
+    <table class="table table-hover audit-report-table align-middle mb-0">
+      <thead class="table-dark-header">
+        <tr>
+          <th style="width: 50px;">ID</th>
+          <th style="min-width: 220px;">TASK TITLE &amp; DETAILS</th>
+          <th style="min-width: 120px;">STATUS</th>
+          <th style="min-width: 100px;">PRIORITY</th>
+          <th style="min-width: 110px;">ASSIGN DATE</th>
+          <th style="min-width: 110px;">DEADLINE</th>
+          <th style="min-width: 120px;">COMPLETE DATE</th>
+          <th style="min-width: 130px;">ASSIGNEE</th>
+          <th style="min-width: 130px;">ASSIGNED BY</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of pagedTasks">
+          <!-- ID -->
+          <td class="fw-bold text-muted small">{{ t.id }}</td>
+
+          <!-- Title & Description -->
+          <td>
+            <div class="fw-bold text-main">{{ t.title }}</div>
+            <div class="text-muted x-small text-truncate" style="max-width: 320px;" *ngIf="t.description">
+              {{ t.description }}
+            </div>
+          </td>
+
+          <!-- Status Badge -->
+          <td>
+            <span class="badge-status st-{{ t.status }} py-1 px-2.5">
+              <i class="bi" [ngClass]="t.status === 'DONE' ? 'bi-check2-circle' : (t.status === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-hourglass-split')"></i>
+              {{ t.status | label }}
+            </span>
+          </td>
+
+          <!-- Priority -->
+          <td>
+            <span class="badge-priority pr-{{ t.priority }}">
+              {{ t.priority }}
+            </span>
+          </td>
+
+          <!-- Assign Date (createdAt) -->
+          <td>
+            <span class="text-muted small fw-medium">
+              <i class="bi bi-calendar-event me-1 text-primary"></i>
+              {{ t.createdAt ? (t.createdAt | date:'yyyy-MM-dd') : '—' }}
+            </span>
+          </td>
+
+          <!-- Deadline -->
+          <td>
+            <div class="d-inline-flex flex-column">
+              <span class="small fw-medium" [class.text-danger]="isOverdue(t)">
+                {{ t.deadline ? (t.deadline | date:'yyyy-MM-dd') : '—' }}
+              </span>
+              <span class="badge bg-danger-subtle text-danger x-small mt-0.5" *ngIf="isOverdue(t)">
+                Overdue
+              </span>
+            </div>
+          </td>
+
+          <!-- Complete Date (updatedAt if DONE) -->
+          <td>
+            <span *ngIf="t.status === 'DONE'" class="text-success small fw-semibold">
+              <i class="bi bi-calendar-check me-1"></i>
+              {{ (t.updatedAt || t.createdAt) | date:'yyyy-MM-dd' }}
+            </span>
+            <span *ngIf="t.status !== 'DONE'" class="text-muted small">
+              —
+            </span>
+          </td>
+
+          <!-- Assignee -->
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar-sm-circle">
+                {{ t.assignedToName ? t.assignedToName.charAt(0).toUpperCase() : 'U' }}
+              </div>
+              <span class="small fw-semibold text-main">{{ t.assignedToName }}</span>
+            </div>
+          </td>
+
+          <!-- Assigned By -->
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-light text-secondary border x-small">
+                {{ t.assignedByName }}
+              </span>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="filteredTasks.length === 0">
+          <td colspan="9" class="text-center py-5">
+            <div class="text-muted mb-2">
+              <i class="bi bi-inbox fs-2"></i>
+            </div>
+            <div class="fw-semibold text-main">No Audit Records Found</div>
+            <div class="text-muted x-small">No tasks match your current search and filter criteria.</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Table Pagination & Record Counter -->
+  <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center flex-wrap gap-2" *ngIf="filteredTasks.length > 0">
+    <div class="text-muted x-small">
+      Showing 
+      <span class="fw-bold text-main">{{ page * pageSize + 1 }}</span> to 
+      <span class="fw-bold text-main">{{ Math.min((page + 1) * pageSize, filteredTasks.length) }}</span> of 
+      <span class="fw-bold text-main">{{ filteredTasks.length }}</span> total audit records
+    </div>
+
+    <!-- Paging Controls -->
+    <div class="d-flex gap-2 align-items-center">
+      <button class="btn btn-sm btn-outline-secondary" [disabled]="page === 0" (click)="page = page - 1">
+        <i class="bi bi-chevron-left me-1"></i> Prev
+      </button>
+      <span class="x-small text-muted px-2">Page {{ page + 1 }} of {{ totalPages }}</span>
+      <button class="btn btn-sm btn-outline-secondary" [disabled]="page >= totalPages - 1" (click)="page = page + 1">
+        Next <i class="bi bi-chevron-right ms-1"></i>
+      </button>
+    </div>
+  </div>
+</div>

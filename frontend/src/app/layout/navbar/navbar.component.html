@@ -1,0 +1,412 @@
+<header class="app-topbar shadow-sm">
+  <div class="topbar-content d-flex align-items-center justify-content-between w-100 px-3 px-lg-4">
+    <!-- LEFT SIDE: Collapse Button & Global Search Bar -->
+    <div class="d-flex align-items-center gap-3 flex-grow-1">
+      <!-- Sidebar / Mobile Drawer Toggle Button -->
+      <button class="btn-toggle-sidebar" type="button" (click)="layout.toggleSidebar()" title="Toggle Navigation Menu">
+        <i class="bi bi-list fs-5 d-lg-none"></i>
+        <i class="bi d-none d-lg-inline" [ngClass]="layout.isCollapsed ? 'bi-text-indent-left' : 'bi-text-indent-right'"></i>
+      </button>
+
+      <!-- Global Search Bar -->
+      <div class="top-search-wrap">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="form-control top-search-input" 
+               placeholder="Search tasks, team members, or reports..." 
+               [value]="layout.searchQuery$ | async"
+               (input)="onSearchInput($any($event.target).value)"
+               (keydown.enter)="onSearchEnter()">
+        <button type="button" class="btn-clear-search" *ngIf="(layout.searchQuery$ | async)" (click)="clearSearch()" title="Clear search">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Notifications & Profile -->
+    <div class="d-flex align-items-center gap-2 gap-md-3 position-relative">
+      
+      <!-- NOTIFICATION BELL WITH UNREAD BADGE -->
+      <div class="notification-container position-relative">
+        <button class="btn-topbar-notification" type="button" (click)="toggleNotifications($event)" title="Notifications">
+          <i class="bi bi-bell-fill"></i>
+          <span class="notification-badge-pulse" *ngIf="unreadCount > 0">
+            {{ unreadCount > 9 ? '9+' : unreadCount }}
+          </span>
+        </button>
+
+        <!-- NOTIFICATIONS DROPDOWN PANEL -->
+        <div class="notification-dropdown-panel shadow-lg" *ngIf="notificationsOpen" (click)="$event.stopPropagation()">
+          <!-- Header -->
+          <div class="notif-header p-3 border-bottom d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold text-main fs-6">Notifications</span>
+              <span class="badge bg-primary rounded-pill px-2 py-0.5 x-small" *ngIf="unreadCount > 0">
+                {{ unreadCount }} new
+              </span>
+            </div>
+            <button type="button" class="btn-mark-all-read" (click)="markAllRead()" *ngIf="unreadCount > 0" title="Mark all as read">
+              <i class="bi bi-check2-all me-1"></i> Mark all read
+            </button>
+          </div>
+
+          <!-- Notification List Items -->
+          <div class="notif-list-body">
+            <div *ngFor="let n of userNotifications" 
+                 class="notif-item p-3 border-bottom d-flex gap-3 align-items-start" 
+                 [class.unread]="!n.read"
+                 (click)="onNotificationClick(n)"
+                 role="button">
+              
+              <!-- Icon -->
+              <div class="notif-icon-circle flex-shrink-0" [ngClass]="getNotifIconClass(n.type)">
+                <i class="bi" [ngClass]="getNotifIcon(n.type)"></i>
+              </div>
+
+              <!-- Text Content -->
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-bold text-main small text-truncate">{{ n.title }}</span>
+                  <span class="text-muted x-small ms-2 flex-shrink-0">{{ getTimeAgo(n.timestamp) }}</span>
+                </div>
+                <p class="text-muted x-small mb-0 text-break line-clamp-2">{{ n.message }}</p>
+              </div>
+
+              <!-- Unread Dot -->
+              <span class="notif-unread-dot" *ngIf="!n.read" title="Unread"></span>
+            </div>
+
+            <!-- Empty State -->
+            <div class="text-center py-5 px-3" *ngIf="userNotifications.length === 0">
+              <div class="notif-empty-icon mb-2">
+                <i class="bi bi-bell-slash text-muted fs-3"></i>
+              </div>
+              <div class="fw-semibold text-main small">No Notifications</div>
+              <div class="text-muted x-small">You're all caught up with your tasks.</div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="notif-footer p-2 text-center border-top bg-light" *ngIf="userNotifications.length > 0">
+            <button type="button" class="btn btn-link btn-sm text-muted text-decoration-none x-small" (click)="clearAll()">
+              <i class="bi bi-trash3 me-1"></i> Clear all notifications
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Profile Trigger Button -->
+      <div class="user-profile-trigger" (click)="toggleDropdown($event)" role="button" tabindex="0">
+        <!-- Avatar Photo or Initial -->
+        <div class="topbar-avatar" *ngIf="session.avatar$ | async as photo">
+          <img [src]="photo" alt="Avatar" class="avatar-img">
+        </div>
+        <div class="topbar-avatar avatar-initials" *ngIf="!(session.avatar$ | async)">
+          {{ session.name ? session.name.charAt(0).toUpperCase() : 'U' }}
+        </div>
+
+        <!-- Name & Role -->
+        <div class="user-meta d-none d-md-flex flex-column text-start">
+          <span class="user-title fw-bold text-main">{{ session.name }}</span>
+          <span class="badge-role role-{{ session.role }} py-0 px-2" style="font-size: 0.65rem;">
+            {{ session.role }}
+          </span>
+        </div>
+
+        <i class="bi bi-chevron-down text-muted small ms-1"></i>
+      </div>
+
+      <!-- PROFILE DROPDOWN MENU -->
+      <div class="profile-dropdown-menu shadow-lg" *ngIf="dropdownOpen" (click)="$event.stopPropagation()">
+        <!-- Header Info -->
+        <div class="dropdown-user-header p-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="topbar-avatar" *ngIf="session.avatar$ | async as photo">
+              <img [src]="photo" alt="Avatar" class="avatar-img">
+            </div>
+            <div class="topbar-avatar avatar-initials" *ngIf="!(session.avatar$ | async)">
+              {{ session.name ? session.name.charAt(0).toUpperCase() : 'U' }}
+            </div>
+            <div class="overflow-hidden">
+              <div class="fw-bold text-main text-truncate">{{ session.name }}</div>
+              <div class="text-muted small text-truncate">{{ session.email }}</div>
+              <div class="mt-1">
+                <span class="badge-role role-{{ session.role }} py-0 px-2" style="font-size: 0.65rem;">
+                  {{ session.role }} MODE
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown-divider my-1"></div>
+
+        <!-- Menu Action Items -->
+        <div class="p-1">
+          <!-- Primary Edit Profile Settings (Personal Info, Photo & Password inside tabs) -->
+          <button class="dropdown-action-item w-100" (click)="openSettingsModal('info')">
+            <i class="bi bi-person-gear text-primary"></i>
+            <div class="d-flex flex-column text-start">
+              <span class="fw-semibold">Edit Profile</span>
+              <span class="text-muted x-small">Personal info, photo &amp; security</span>
+            </div>
+          </button>
+        </div>
+
+        <div class="dropdown-divider my-1"></div>
+
+        <!-- Sign Out (Reliable, direct click) -->
+        <div class="p-1">
+          <button class="dropdown-action-item dropdown-logout w-100 text-danger" (click)="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+            <span class="fw-semibold">Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PROFILE SETTINGS -->
+<div class="modal-backdrop-custom" *ngIf="showProfileSettingsModal" (click)="closeSettingsModal()">
+  <div class="panel user-modal profile-settings-modal p-0" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-premium-header p-4 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
+        <div class="settings-modal-icon-premium">
+          <i class="bi bi-person-gear"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold mb-0 text-main font-heading">Account &amp; Profile Settings</h5>
+          <p class="text-muted x-small mb-0 mt-0.5">Manage your workspace identity, avatar photo, and account security</p>
+        </div>
+      </div>
+      <button type="button" class="btn-close-premium" (click)="closeSettingsModal()" title="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Segmented Modern Pill Tabs -->
+    <div class="modal-segmented-tabs-wrapper px-4 pt-1">
+      <div class="modal-segmented-tabs">
+        <button type="button" class="segmented-tab-btn" 
+                [class.active]="activeTab === 'info'" 
+                (click)="activeTab = 'info'">
+          <i class="bi bi-person-vcard"></i>
+          <span>Personal Info</span>
+        </button>
+        <button type="button" class="segmented-tab-btn" 
+                [class.active]="activeTab === 'photo'" 
+                (click)="activeTab = 'photo'">
+          <i class="bi bi-camera"></i>
+          <span>Profile Photo</span>
+        </button>
+        <button type="button" class="segmented-tab-btn" 
+                [class.active]="activeTab === 'password'" 
+                (click)="activeTab = 'password'">
+          <i class="bi bi-shield-lock"></i>
+          <span>Security</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Tab Content Area -->
+    <div class="p-4 modal-tab-body">
+
+      <!-- TAB 1: PERSONAL INFO -->
+      <div *ngIf="activeTab === 'info'" class="tab-pane-animate">
+        
+        <!-- Live Identity Summary Card -->
+        <div class="identity-preview-card p-3 mb-4 d-flex align-items-center gap-3">
+          <div class="identity-card-avatar position-relative">
+            <div class="avatar-circle-sm" *ngIf="session.avatar$ | async as photo">
+              <img [src]="photo" alt="Avatar" class="avatar-img">
+            </div>
+            <div class="avatar-circle-sm avatar-initials-sm" *ngIf="!(session.avatar$ | async)">
+              {{ session.name ? session.name.charAt(0).toUpperCase() : 'U' }}
+            </div>
+            <span class="active-status-dot" title="Active Account"></span>
+          </div>
+          <div class="overflow-hidden flex-grow-1">
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold text-main fs-6">{{ session.name }}</span>
+              <span class="badge-role-pill role-{{ session.role }} py-0 px-2">
+                {{ session.role }}
+              </span>
+            </div>
+            <div class="text-muted x-small mt-0.5">{{ session.email }}</div>
+          </div>
+          <div class="text-end d-none d-sm-block">
+            <span class="verified-identity-badge">
+              <i class="bi bi-patch-check-fill text-primary me-1"></i> Verified
+            </span>
+          </div>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <!-- Full Display Name -->
+          <div class="mb-3">
+            <label class="form-label-premium">
+              <i class="bi bi-person me-1 text-primary"></i> FULL DISPLAY NAME
+            </label>
+            <div class="input-icon-wrap-premium">
+              <input type="text" class="form-control premium-input" formControlName="fullName" placeholder="Enter your full name">
+            </div>
+            <div class="form-hint-text">
+              <i class="bi bi-info-circle me-1"></i> This name appears on assigned task cards, audit logs, and PDF reports.
+            </div>
+          </div>
+
+          <!-- Email (System Locked) -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label-premium mb-0">
+                <i class="bi bi-envelope me-1 text-primary"></i> WORK EMAIL ADDRESS (IDENTITY)
+              </label>
+              <span class="locked-badge"><i class="bi bi-lock-fill me-1"></i> Read-Only</span>
+            </div>
+            <div class="input-icon-wrap-premium">
+              <input type="email" class="form-control premium-input input-locked" formControlName="email">
+            </div>
+            <div class="form-hint-text">
+              Managed by enterprise administrator for authentication compliance.
+            </div>
+          </div>
+
+          <!-- System Privileges Badge Card -->
+          <div class="mb-4 privileges-info-card p-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-shield-check text-success fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-main x-small text-uppercase">Role Access Level</div>
+                  <div class="fw-bold text-primary">{{ session.role }} PRIVILEGES</div>
+                </div>
+              </div>
+              <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill x-small fw-semibold">
+                ● Active Permissions
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="modal-footer-premium pt-3 border-top d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-premium-secondary" (click)="closeSettingsModal()">Close</button>
+            <button type="submit" class="btn btn-premium-primary" [disabled]="profileForm.invalid || savingProfile">
+              <span *ngIf="savingProfile" class="spinner-border spinner-border-sm me-1.5"></span>
+              <span>{{ savingProfile ? 'Saving Changes…' : 'Save Changes' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 2: CHANGE PHOTO (File upload & 6 Pro Presets) -->
+      <div *ngIf="activeTab === 'photo'" class="tab-pane-animate">
+        
+        <!-- Big Circular Avatar Preview with Camera Overlay -->
+        <div class="text-center py-2 mb-4">
+          <div class="avatar-preview-luxury-wrap mx-auto mb-3">
+            <div class="avatar-preview-luxury">
+              <img *ngIf="previewPhotoUrl" [src]="previewPhotoUrl" alt="Avatar Preview" class="avatar-img">
+              <div *ngIf="!previewPhotoUrl" class="avatar-luxury-placeholder">
+                {{ session.name ? session.name.charAt(0).toUpperCase() : 'U' }}
+              </div>
+            </div>
+            <label class="camera-upload-floating-btn" title="Upload custom photo">
+              <i class="bi bi-camera-fill"></i>
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+            </label>
+          </div>
+
+          <label class="btn btn-premium-upload btn-sm mb-1.5" style="cursor: pointer;">
+            <i class="bi bi-cloud-arrow-up me-1.5"></i> Upload Custom Picture
+            <input type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+          </label>
+          <div class="text-muted x-small">Supported: JPG, PNG or WebP up to 2MB</div>
+        </div>
+
+        <!-- Photo Actions Footer -->
+        <div class="modal-footer-premium pt-3 border-top d-flex justify-content-between align-items-center">
+          <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" (click)="removePhoto()" *ngIf="session.avatar$ | async">
+            <i class="bi bi-trash me-1"></i> Remove Photo
+          </button>
+          <div class="ms-auto d-flex gap-2">
+            <button type="button" class="btn btn-premium-secondary" (click)="closeSettingsModal()">Close</button>
+            <button type="button" class="btn btn-premium-primary" (click)="savePhoto()">
+              <i class="bi bi-check2 me-1"></i> Apply Photo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: CHANGE PASSWORD -->
+      <div *ngIf="activeTab === 'password'" class="tab-pane-animate">
+        
+        <!-- Security Info Callout -->
+        <div class="security-info-callout p-3 mb-4 d-flex align-items-center gap-3">
+          <div class="security-icon-circle">
+            <i class="bi bi-shield-lock-fill text-primary"></i>
+          </div>
+          <div>
+            <div class="fw-bold text-main x-small text-uppercase">Stateless Authentication</div>
+            <div class="text-muted x-small">Passwords are cryptographically salted and hashed with BCrypt (12 rounds) on the server.</div>
+          </div>
+        </div>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+          <!-- Current Password -->
+          <div class="mb-3">
+            <label class="form-label-premium">
+              <i class="bi bi-key me-1 text-primary"></i> CURRENT PASSWORD
+            </label>
+            <div class="input-icon-wrap-premium position-relative">
+              <input [type]="showCurrentPw ? 'text' : 'password'" class="form-control premium-input pe-5" formControlName="currentPassword" placeholder="Enter current password">
+              <button type="button" class="btn-toggle-pw-premium" (click)="showCurrentPw = !showCurrentPw" tabindex="-1">
+                <i class="bi" [ngClass]="showCurrentPw ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- New Password -->
+          <div class="mb-3">
+            <label class="form-label-premium">
+              <i class="bi bi-shield-lock me-1 text-primary"></i> NEW PASSWORD
+            </label>
+            <div class="input-icon-wrap-premium position-relative">
+              <input [type]="showNewPw ? 'text' : 'password'" class="form-control premium-input pe-5" formControlName="newPassword" placeholder="Minimum 6 characters">
+              <button type="button" class="btn-toggle-pw-premium" (click)="showNewPw = !showNewPw" tabindex="-1">
+                <i class="bi" [ngClass]="showNewPw ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+              </button>
+            </div>
+            <div class="form-hint-text">
+              Must be at least 6 characters long.
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-4">
+            <label class="form-label-premium">
+              <i class="bi bi-shield-check me-1 text-primary"></i> CONFIRM NEW PASSWORD
+            </label>
+            <div class="input-icon-wrap-premium position-relative">
+              <input [type]="showConfirmPw ? 'text' : 'password'" class="form-control premium-input pe-5" formControlName="confirmPassword" placeholder="Repeat new password">
+              <button type="button" class="btn-toggle-pw-premium" (click)="showConfirmPw = !showConfirmPw" tabindex="-1">
+                <i class="bi" [ngClass]="showConfirmPw ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Password Actions Footer -->
+          <div class="modal-footer-premium pt-3 border-top d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-premium-secondary" (click)="closeSettingsModal()">Close</button>
+            <button type="submit" class="btn btn-premium-primary" [disabled]="passwordForm.invalid || savingPassword">
+              <span *ngIf="savingPassword" class="spinner-border spinner-border-sm me-1.5"></span>
+              <span>{{ savingPassword ? 'Updating…' : 'Update Password' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>

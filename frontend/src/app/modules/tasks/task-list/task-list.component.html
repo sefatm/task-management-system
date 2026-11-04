@@ -1,0 +1,179 @@
+<!-- Header with Action Button -->
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div>
+    <h3 class="page-title fw-bold mb-1">Task Directory</h3>
+    <p class="text-muted small mb-0">
+      {{ session.hasRole('ADMIN') ? 'Full enterprise view: inspect, filter, and manage all assigned tasks across the organization.' : 'Team workload: view and track progress for tasks assigned to your direct reports.' }}
+    </p>
+  </div>
+  <a routerLink="/tasks/new" class="btn btn-primary shadow-sm">
+    <i class="bi bi-plus-lg me-1"></i> Assign New Task
+  </a>
+</div>
+
+<!-- Filter & Workflow Pipeline Tabs -->
+<div class="panel p-3 mb-4 shadow-sm border-0">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    
+    <!-- Status Segmented Tabs -->
+    <div class="status-tab-group">
+      <button type="button" class="status-tab" [class.active]="filter.status === ''" (click)="setStatusTab('')">
+        <span>All</span>
+        <span class="tab-badge">{{ totalCount }}</span>
+      </button>
+
+      <button type="button" class="status-tab" [class.active]="filter.status === 'PENDING'" (click)="setStatusTab('PENDING')">
+        <span class="status-dot dot-pending"></span>
+        <span>Pending</span>
+        <span class="tab-badge">{{ pendingCount }}</span>
+      </button>
+
+      <button type="button" class="status-tab" [class.active]="filter.status === 'IN_PROGRESS'" (click)="setStatusTab('IN_PROGRESS')">
+        <span class="status-dot dot-inprogress"></span>
+        <span>In Progress</span>
+        <span class="tab-badge">{{ inProgressCount }}</span>
+      </button>
+
+      <button type="button" class="status-tab" [class.active]="filter.status === 'DONE'" (click)="setStatusTab('DONE')">
+        <span class="status-dot dot-done"></span>
+        <span>Completed</span>
+        <span class="tab-badge">{{ completedCount }}</span>
+      </button>
+    </div>
+
+    <!-- Dropdowns: Assignee & Priority -->
+    <div class="d-flex align-items-center gap-2 ms-auto flex-wrap">
+      <!-- Assignee Filter -->
+      <div class="filter-select-wrap">
+        <select class="form-select modern-select" [(ngModel)]="filter.assigneeId" (ngModelChange)="page = 0" aria-label="Assignee filter">
+          <option value="">All Assignees</option>
+          <option *ngFor="let a of assignees" [ngValue]="a.id">{{ a.fullName }}</option>
+        </select>
+      </div>
+
+      <!-- Priority Filter -->
+      <div class="filter-select-wrap">
+        <select class="form-select modern-select" [(ngModel)]="filter.priority" (ngModelChange)="page = 0" aria-label="Priority filter">
+          <option value="">All Priorities</option>
+          <option *ngFor="let p of priorities" [value]="p">{{ p | label }}</option>
+        </select>
+      </div>
+
+      <!-- Reset -->
+      <button type="button" class="btn btn-reset" (click)="resetFilter()" title="Reset Filters" *ngIf="filter.status || filter.priority || filter.assigneeId || searchQuery">
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Tasks Cards / Row List -->
+<div class="tasks-container">
+  
+  <div *ngFor="let t of paged" class="task-card shadow-sm border-0 mb-3" [ngClass]="'border-status-' + t.status">
+    
+    <div class="task-card-body p-3 p-md-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+      
+      <!-- Main Info -->
+      <div class="task-main-info d-flex align-items-start gap-3">
+        <!-- Status Icon -->
+        <div class="task-status-icon" [ngClass]="'icon-status-' + t.status">
+          <i class="bi" [ngClass]="t.status === 'DONE' ? 'bi-check-circle-fill' : (t.status === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-hourglass-split')"></i>
+        </div>
+
+        <div>
+          <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+            <h5 class="task-title fw-bold mb-0">
+              {{ t.title }}
+            </h5>
+
+            <!-- Priority -->
+            <span class="badge-priority pr-{{ t.priority }}">
+              <i class="bi" [ngClass]="t.priority === 'HIGH' ? 'bi-lightning-fill text-danger' : (t.priority === 'MEDIUM' ? 'bi-dash-circle' : 'bi-arrow-down')"></i>
+              {{ t.priority | label }}
+            </span>
+
+            <!-- Status -->
+            <span class="badge-status st-{{ t.status }}">
+              {{ t.status | label }}
+            </span>
+          </div>
+
+          <!-- Description -->
+          <p class="task-desc text-muted mb-2" *ngIf="t.description">
+            {{ t.description }}
+          </p>
+
+          <!-- Assigned To & Deadline -->
+          <div class="task-meta d-flex align-items-center gap-3 flex-wrap">
+            <!-- Assignee -->
+            <div class="d-flex align-items-center gap-2" *ngIf="t.assignedToName">
+              <div class="meta-avatar meta-avatar-assignee">
+                {{ t.assignedToName.charAt(0).toUpperCase() }}
+              </div>
+              <span class="x-small text-muted">
+                Assigned to <strong class="text-secondary">{{ t.assignedToName }}</strong>
+              </span>
+            </div>
+
+            <!-- Assigner (For Admin) -->
+            <div class="d-flex align-items-center gap-2" *ngIf="session.hasRole('ADMIN') && t.assignedByName">
+              <span class="x-small text-muted">
+                by {{ t.assignedByName }}
+              </span>
+            </div>
+
+            <!-- Deadline -->
+            <div class="d-flex align-items-center gap-1 x-small" *ngIf="t.deadline">
+              <i class="bi bi-calendar3 text-muted"></i>
+              <span class="text-secondary fw-medium">{{ t.deadline | date:'mediumDate' }}</span>
+              <span *ngIf="isOverdue(t)" class="badge-overdue ms-1">
+                <i class="bi bi-exclamation-triangle-fill"></i> Overdue
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons (Edit / Delete) -->
+      <div class="task-actions d-flex align-items-center gap-2 ms-auto">
+        <a [routerLink]="['/tasks', t.id, 'edit']" class="btn btn-sm btn-outline-secondary btn-action-icon" title="Edit Task">
+          <i class="bi bi-pencil-square"></i>
+        </a>
+        <button *ngIf="session.hasRole('ADMIN')" type="button" class="btn btn-sm btn-outline-danger btn-action-icon" (click)="remove(t)" title="Delete Task">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="loaded && filteredTasks.length === 0" class="panel p-5 text-center shadow-sm border-0">
+    <div class="empty-icon-wrap mb-3 mx-auto">
+      <i class="bi bi-inbox"></i>
+    </div>
+    <h5 class="fw-bold text-main mb-1">No tasks in this view</h5>
+    <p class="text-muted small mb-3">Try adjusting your filters, searching for a different keyword, or assign a new task.</p>
+    <button type="button" class="btn btn-outline-primary btn-sm" (click)="resetFilter()">
+      <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filters
+    </button>
+  </div>
+
+  <!-- Pagination -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4" *ngIf="totalPages > 1">
+    <div class="text-muted small">
+      Showing {{ page * pageSize + 1 }} to {{ Math.min((page + 1) * pageSize, filteredTasks.length) }} of {{ filteredTasks.length }} tasks
+    </div>
+    <div class="d-flex gap-1">
+      <button class="btn btn-sm btn-outline-secondary" [disabled]="page === 0" (click)="page = page - 1">
+        Previous
+      </button>
+      <button class="btn btn-sm btn-outline-secondary" [disabled]="page >= totalPages - 1" (click)="page = page + 1">
+        Next
+      </button>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,140 @@
+/* ==========================================================================
+   Modern White & Premium Light Dashboard
+   ========================================================================== */
+
+/* Welcome Banner (Modern White Elevated Card) */
+.welcome-banner {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  background-image: 
+    radial-gradient(circle at 100% 0%, rgba(2, 132, 199, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(99, 102, 241, 0.03) 0%, transparent 40%);
+}
+
+.welcome-heading {
+  color: #0f172a;
+  font-size: 1.85rem;
+  letter-spacing: -0.025em;
+}
+
+.welcome-subtext {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* Stat Cards */
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  position: relative;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.08);
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.stat-number {
+  font-size: 2.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #0f172a;
+}
+
+.stat-footer {
+  font-size: 0.825rem;
+  margin-top: 0.75rem;
+  color: #64748b;
+}
+
+.stat-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+.icon-blue {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.icon-purple {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.icon-green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.progress-stat {
+  height: 8px;
+  border-radius: 10px;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+/* Status Cards */
+.border-start-status {
+  border-left-width: 5px !important;
+}
+
+.border-PENDING {
+  border-left-color: #f59e0b !important;
+}
+
+.border-IN_PROGRESS {
+  border-left-color: #0284c7 !important;
+}
+
+.border-DONE {
+  border-left-color: #10b981 !important;
+}
+
+/* Shortcuts */
+.shortcut-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shortcut-box:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px -2px rgba(15, 23, 42, 0.06);
+}
+
+.shortcut-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}

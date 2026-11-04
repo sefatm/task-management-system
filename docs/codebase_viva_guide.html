@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>TaskFlow Enterprise - Codebase Deep-Dive & Viva Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+  @page {
+    size: A4;
+    margin: 12mm 14mm 12mm 14mm;
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body {
+    font-family: 'Hind Siliguri', 'Plus Jakarta Sans', -apple-system, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    line-height: 1.55;
+    font-size: 11.5px;
+    margin: 0;
+    padding: 0;
+  }
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+  .hero-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #ffffff;
+    padding: 22px 26px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(2, 132, 199, 0.25);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .hero-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+  }
+  .hero-sub {
+    font-size: 11.5px;
+    color: #94a3b8;
+    margin: 0;
+  }
+  .section-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #0f172a;
+    border-bottom: 2px solid #0284c7;
+    padding-bottom: 4px;
+    margin: 16px 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .pattern-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .pattern-card h4 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0284c7;
+    margin: 0 0 5px 0;
+  }
+  .pattern-card p {
+    font-size: 11px;
+    color: #334155;
+    margin: 0 0 6px 0;
+  }
+  .script-box {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-left: 3px solid #6366f1;
+    border-radius: 0 6px 6px 0;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #3730a3;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .code-highlight {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 9px 12px;
+    margin-bottom: 8px;
+  }
+  .code-highlight h4 {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+  }
+  .code-highlight p {
+    font-size: 10.5px;
+    color: #475569;
+    margin: 0 0 5px 0;
+  }
+  .viva-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 9px;
+  }
+  .viva-q {
+    font-size: 12px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+  .viva-a {
+    font-size: 11px;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+  .viva-speaking-label {
+    color: #4338ca;
+    font-weight: 700;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10.5px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+  th {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 700;
+    border: 1px solid #0f172a;
+  }
+  td {
+    padding: 5px 8px;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+  }
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+  .footer-text {
+    text-align: center;
+    font-size: 9.5px;
+    color: #94a3b8;
+    margin-top: 14px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <div class="hero-banner">
+    <span class="hero-tag"><i class="bi bi-mortarboard-fill"></i> টেকনিক্যাল ভাইভা প্রস্তুতি গাইড</span>
+    <h1 class="hero-title">TaskFlow Enterprise Suite — কোডবেস ডিপ-ডাইভ ও ভাইভা ডিফেন্স গাইড</h1>
+    <p class="hero-sub">আর্কিটেকচারাল ডিজাইন প্যাটার্ন, গুরুত্বপূর্ণ কোড ওয়াকথ্রু ও শীর্ষ ২৫টি ভাইভা প্রশ্নোত্তর (সহজ বাংলা বিবরণ ও স্পিকিং স্ক্রিপ্ট)</p>
+  </div>
+
+  <!-- PART 1: DESIGN PATTERNS -->
+  <div class="section-title">
+    <i class="bi bi-boxes text-primary"></i> পার্ট ১: মূল সফটওয়্যার ডিজাইন প্যাটার্নসমূহ (Design Patterns)
+  </div>
+
+  <div class="card-grid-2">
+    <div class="pattern-card">
+      <h4>১. Layered / N-Tier Architecture Pattern</h4>
+      <p>কোডের প্রতিটি লেয়ারের দায়িত্ব আলাদা রাখা হয়েছে:</p>
+      <ul>
+        <li><strong>Controller:</strong> রিকোয়েস্ট রিসিভ ও Jakarta @Valid ইনপুট ভ্যালিডেশন করে।</li>
+        <li><strong>Service:</strong> বিজনেস রুলস ও @Transactional ডাটাবেস নিরাপত্তা নিশ্চিত করে।</li>
+        <li><strong>Repository:</strong> Spring Data JPA দিয়ে কুয়েরি এক্সিকিউট করে।</li>
+      </ul>
+      <div class="script-box">
+        ভাইভায় বলবেন: "স্যার, আমাদের প্রজেক্টে লেয়ার্ড আর্কিটেকচার ব্যবহার করা হয়েছে। এতে কোড সহজে মেইনটেইন ও টেস্ট করা যায় এবং সিঙ্গেল রেসপনসিবিলিটি প্রিন্সিপাল বজায় থাকে।"
+      </div>
+    </div>
+
+    <div class="pattern-card">
+      <h4>২. Data Transfer Object (DTO) Pattern</h4>
+      <p>ডাটাবেস এন্টিটিকে সরাসরি ফ্রন্টএন্ডে এক্সপোজ না করে DTO ব্যবহার করা হয়েছে:</p>
+      <ul>
+        <li>Java 17 এর ইমিউটেবল `record` দিয়ে DTO তৈরি করা হয়েছে।</li>
+        <li>পাসওয়ার্ড হ্যাশ বা সংবেদনশীল ডাটা লিক হওয়া সম্পূর্ণ বন্ধ থাকে।</li>
+        <li>Mass-Assignment বা Over-Posting আক্রমণ থেকে সুরক্ষা দেয়।</li>
+      </ul>
+      <div class="script-box">
+        ভাইভায় বলবেন: "স্যার, সিকিউরিটির জন্য আমরা DTO রেকর্ড ব্যবহার করেছি। ক্লায়েন্ট কখনোই ডাটাবেসের ইন্টারনাল এন্টিটি সরাসরি দেখতে বা পরিবর্তন করতে পারে না।"
+      </div>
+    </div>
+
+    <div class="pattern-card">
+      <h4>৩. Dynamic Criteria Specification Pattern</h4>
+      <p>রানটাইমে ডাইনামিক ও টাইপ-সেফ ডাটাবেস কুয়েরি তৈরি:</p>
+      <ul>
+        <li>TaskRepository ইন্টারফেস `JpaSpecificationExecutor` এক্সটেন্ড করে।</li>
+        <li>CriteriaBuilder দিয়ে স্ট্যাটাস, প্রায়োরিটি ও ইউজারের শর্ত একসাথে যুক্ত হয়।</li>
+        <li>কোনো স্ট্রিং কনক্যাটিনেশন না থাকায় SQL ইনজেকশন অসম্ভব।</li>
+      </ul>
+      <div class="script-box">
+        ভাইভায় বলবেন: "স্যার, আমরা ফিল্টারিংয়ের জন্য JPA Specification ব্যবহার করেছি। এটি রানটাইমে ডাইনামিক ও টাইপ-সেফ কুয়েরি তৈরি করে এবং SQL Injection ঝুঁকি শূন্য করে।"
+      </div>
+    </div>
+
+    <div class="pattern-card">
+      <h4>৪. Reactive State &amp; Interceptor Pattern</h4>
+      <p>ফ্রন্টএন্ডে রিয়েল-টাইম স্টেট এবং নিরাপত্তা নিশ্চিতকরণ:</p>
+      <ul>
+        <li>RxJS `BehaviorSubject` দিয়ে সেশন ও নোটিফিকেশন স্টেট ম্যানেজ হয়।</li>
+        <li>Angular `HttpInterceptor` প্রতিটি রিকোয়েস্টে Bearer টোকেন যোগ করে।</li>
+        <li>`AuthGuard` ক্লায়েন্ট-সাইডে অননুমোদিত ইউআরএল এক্সেস ব্লক করে।</li>
+      </ul>
+      <div class="script-box">
+        ভাইভায় বলবেন: "স্যার, ফ্রন্টএন্ডে আমরা RxJS BehaviorSubject এবং HTTP Interceptor ব্যবহার করেছি, যার ফলে প্রতিটি কম্পোনেন্টে রিয়েল-টাইম আপডেট ও স্বয়ংক্রিয় টোকেন পৌঁছায়।"
+      </div>
+    </div>
+  </div>
+
+  <!-- PART 2: CRITICAL CODE LOGIC -->
+  <div class="section-title">
+    <i class="bi bi-file-code-fill text-primary"></i> পার্ট ২: গুরুত্বপূর্ণ ফাইলের কোড লজিক ওয়াকথ্রু (Code Walkthrough)
+  </div>
+
+  <div class="code-highlight">
+    <h4>১. SecurityConfig.java — স্প্রিং সিকিউরিটি ৬ ফিল্টার চেইন</h4>
+    <p><strong>কী করছে:</strong> CSRF ডিজেবল করা হয়েছে কারণ স্টেটলেস JWT তে কুকি ব্যবহার হয় না। সেশন পলিসি `SessionCreationPolicy.STATELESS` করা হয়েছে। কাস্টম `JwtAuthFilter` কে ইউজারনেম-পাসওয়ার্ড ফিল্টারের পূর্বে রাখা হয়েছে এবং অ্যাথেন্টিকেশন ফেইল করলে কাস্টম JSON 401/403 রেসপন্স রিটার্ন করে।</p>
+    <div class="script-box">
+      ভাইভায় বলবেন: "স্যার, SecurityConfig ক্লাসে স্প্রিং সিকিউরিটি ৬-এর ফিল্টার চেইন ডিফাইন করা হয়েছে। মেথড লেভেলে @PreAuthorize দিয়ে রোল চেক করা হয়।"
+    </div>
+  </div>
+
+  <div class="code-highlight">
+    <h4>২. TaskService.java — রো-লেভেল সিকিউরিটি ও স্ট্যাটাস স্টেট মেশিন</h4>
+    <p><strong>কী করছে:</strong> `updateStatus()` মেথডে চেক করা হয় `next.ordinal() == current.ordinal() + 1`। ফলে স্ট্যাটাস শুধুমাত্র PENDING $\rightarrow$ IN_PROGRESS $\rightarrow$ DONE ক্রমেই যেতে পারে। অন্য কোনো কর্মী অন্যের টাস্ক আপডেট করতে গেলে 403 Forbidden এরর দেওয়া হয়।</p>
+    <div class="script-box">
+      ভাইভায় বলবেন: "স্যার, TaskService-এ আমরা রো-লেভেল সিকিউরিটি ও ফরওয়ার্ড-অনলি স্টেট মেশিন ইমপ্লিমেন্ট করেছি যাতে স্ট্যাটাস স্কিপ বা রিভার্স করা না যায়।"
+    </div>
+  </div>
+
+  <div class="code-highlight">
+    <h4>৩. NotificationService.ts — রিঅ্যাক্টিভ ইন-অ্যাপ নোটিফিকেশন সিস্টেম</h4>
+    <p><strong>কী করছে:</strong> নোটিফিকেশনগুলোকে localStorage এবং RxJS BehaviorSubject-এ সিঙ্ক করে রাখে। টাস্ক অ্যাসাইন হলে সংশ্লিষ্ট এমপ্লয়ির ইমেইলে নোটিফিকেশন যায়, এবং এমপ্লয়ি কাজ শেষ করলে অ্যাডমিন ও ম্যানেজারদের কাছে ইনস্ট্যান্ট অ্যালার্ট যায়।</p>
+    <div class="script-box">
+      ভাইভায় বলবেন: "স্যার, NotificationService দিয়ে আমরা সম্পূর্ণ রিয়েল-টাইম ইন-অ্যাপ নোটিফিকেশন হ্যান্ডেল করেছি। বেল আইকনে লাইভ পালসিং আনরিড ব্যাজ প্রদর্শিত হয়।"
+    </div>
+  </div>
+
+  <div class="code-highlight">
+    <h4>৪. ReportService.java — ওপেন-পিডিএফ ভেক্টর রিপোর্টিং ইঞ্জিন</h4>
+    <p><strong>কী করছে:</strong> ওপেন-পিডিএফ লাইব্রেরি দিয়ে মেমোরির মধ্যে সরাসরি ৯-কলামের ল্যান্ডস্কেপ A4 ভেক্টর টেবিল তৈরি করে `byte[]` আকারে ব্রাউজারে স্ট্রিম করে। এতে সার্ভার ডিস্কে কোনো অস্থায়ী ফাইল তৈরি হয় না।</p>
+    <div class="script-box">
+      ভাইভায় বলবেন: "স্যার, ReportService-এ OpenPDF ব্যবহার করে আমরা অ্যাসাইন ডেট, ডেডলাইন ও কমপ্লিট ডেট সহ ডায়নামিক অডিট রিপোর্ট সরাসরি ব্রাউজারে স্ট্রিম করি।"
+    </div>
+  </div>
+
+  <!-- PART 3: TOP 25 VIVA Q&A -->
+  <div class="section-title">
+    <i class="bi bi-question-circle-fill text-primary"></i> পার্ট ৩: শীর্ষ ২৫টি টেকনিক্যাল ভাইভা প্রশ্নোত্তর (বাংলায় স্পিকিং স্ক্রিপ্ট সহ)
+  </div>
+
+  <!-- Q1 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ১. সেশন কুকির পরিবর্তে JWT (JSON Web Token) কেন বেছে নিলেন?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> JWT is stateless, self-contained, and perfectly suited for decoupled SPA architectures. The server does not maintain session state in memory, enabling horizontal scalability.</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, আমাদের অ্যাপ্লিকেশনটি Decoupled (Angular SPA আলাদা এবং Spring Boot REST API আলাদা)। সেশন কুকি ব্যবহার করলে সার্ভারে মেমোরি বা রেডিসে সেশন স্টোর রাখতে হয়। কিন্তু JWT স্টেটলেস হওয়ায় সার্ভারে কোনো সেশন রাখতে হয় না; ক্লায়েন্ট প্রতি রিকোয়েস্টে টোকেন পাঠায় এবং সার্ভার তাৎক্ষণিক ভেরিফাই করে। এটি ক্লাউড ও মাইক্রোসার্ভিসের জন্য স্ট্যান্ডার্ড বেস্ট প্র্যাকটিস।"
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ২. সিস্টেমে পাসওয়ার্ডের নিরাপত্তা কিভাবে নিশ্চিত করেছেন?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> Passwords are never stored in plain text. Spring Security's BCryptPasswordEncoder with 12 strength rounds is used. BCrypt incorporates adaptive work factor and random salting.</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, আমরা ডাটাবেসে কখনোই প্লেইন পাসওয়ার্ড সংরক্ষণ করি না। Spring Security-র BCryptPasswordEncoder ব্যবহার করা হয়েছে ১২ রাউন্ডের সল্টিং সহ। এতে একই পাসওয়ার্ডের জন্যও প্রতিবার ভিন্ন হ্যাশ তৈরি হয়, যা রেইনবো টেবিল অ্যাটাক এবং ব্রুট-ফোর্স অ্যাটাক থেকে ১০০% সুরক্ষিত রাখে।"
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ৩. রোল-ভিত্তিক এক্সেস কন্ট্রোল (RBAC) কিভাবে কাজ করে?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> Enforced on two layers: Backend uses Spring Security @PreAuthorize method-level checks; Frontend uses Angular AuthGuard to protect private routes.</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, আমাদের সিস্টেমে RBAC ডাবল লেয়ারে সুরক্ষিত। ব্যাকএন্ডে স্প্রিং সিকিউরিটির @PreAuthorize দিয়ে কন্ট্রোলার ও সার্ভিস মেথড সুরক্ষিত করা হয়েছে, আর ফ্রন্টএন্ডে Angular AuthGuard দিয়ে রাউট প্রোটেক্ট করা হয়েছে। ফলে কেউ সরাসরি ইউআরএল টাইপ করলেও ব্যাকএন্ডের 403 Forbidden চেক কোনোভাবেই বাইপাস করা সম্ভব নয়।"
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ৪. একজন কর্মী অন্যের টাস্ক পরিবর্তন করা থেকে কিভাবে বিরত থাকে? (Row-Level Security)</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> In TaskService.updateStatus(), we verify task.getAssignedTo().getId().equals(currentUser.getId()). A mismatch throws an AccessDeniedException (403 Forbidden).</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, TaskService-এর updateStatus মেথডে আমরা Row-Level Security চেক করেছি। বর্তমানে লগইন থাকা ইউজারের আইডির সাথে টাস্কের assignedTo ইউজারের আইডি না মিললে সাথে সাথে AccessDeniedException থ্রো করা হয়, যা 403 Forbidden রিটার্ন করে।"
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ৫. টাস্কের স্ট্যাটাস পরিবর্তন কেন শুধুমাত্র PENDING $\rightarrow$ IN_PROGRESS $\rightarrow$ DONE হতে পারে?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> We check nextStatus.ordinal() == currentStatus.ordinal() + 1. Backward or skipped status changes throw a BadRequestException (HTTP 400).</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, কাজের ধারাবাহিকতা ও নির্ভুল অডিট বজায় রাখতে আমরা ফরওয়ার্ড-অনলি স্টেট মেশিন তৈরি করেছি। এনাম অর্ডিনাল চেক করে দেখা হয় পরবর্তী স্ট্যাটাস ঠিক আগেরটির পরের ধাপ কিনা। ব্যাকওয়ার্ড বা জাম্প করার চেষ্টা করলে সিস্টেম 400 Bad Request প্রদান করে।"
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ৬. ইউজার ডিলিটের ক্ষেত্রে হার্ড ডিলিটের বদলে সফট-ডিলিট কেন ব্যবহার করলেন?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> Hard delete causes Foreign Key integrity violations on past tasks. Soft delete (active=false) preserves historical audit trails while blocking authentication.</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, এন্টারপ্রাইজ সিস্টেমে কর্মী ডিলিট করলে তার পূর্বের সম্পাদিত কাজের ফরেন কী কনস্ট্রেইন্ট ফেইল করবে এবং কাজের অডিট ট্রেইল নষ্ট হবে। তাই আমরা সফট-ডিলিট (active=false) করেছি, যাতে সে আর লগইন করতে না পারে কিন্তু তার কাজের হিস্ট্রি ডাটাবেসে অক্ষুণ্ণ থাকে।"
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ৭. এক্সিকিউটিভ অডিট রিপোর্টিং ও PDF ডাউনলোড কিভাবে কাজ করে?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> ReportService uses OpenPDF to construct a 9-column A4 landscape table and streams the byte array directly as application/pdf to the browser.</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, ReportService-এ OpenPDF লাইব্রেরি ব্যবহার করা হয়েছে। ইউজারের রোল অনুযায়ী টাস্ক ফিল্টার করে অ্যাসাইন ডেট, ডেডলাইন ও কমপ্লিট ডেট সহ ডায়নামিক ৯-কলামের টেবিল তৈরি হয় এবং ইন-মেমোরি বাইনারি স্ট্রিম হিসেবে ডাউনলোড হয়। সার্ভারে কোনো টেম্পোরারি ফাইল জমা হয় না।"
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ৮. সিস্টেমে রিয়েল-টাইম নোটিফিকেশন কিভাবে কাজ করে?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> NotificationService uses RxJS BehaviorSubject synchronized with localStorage to broadcast assignment and completion alerts with role filtering.</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, ফ্রন্টএন্ডে NotificationService-এ RxJS BehaviorSubject ব্যবহার করা হয়েছে। টাস্ক অ্যাসাইন হলে সংশ্লিষ্ট এমপ্লয়ি নোটিফিকেশন পায় এবং কাজ শেষ হলে ম্যানেজার ও অ্যাডমিন লাইভ আনরিড ব্যাজ অ্যালার্ট পায়।"
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ৯. স্প্রিং বুটে GlobalExceptionHandler-এর ভূমিকা কী?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> A @RestControllerAdvice that intercepts all exceptions application-wide and transforms them into a standardized ApiError JSON response.</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, GlobalExceptionHandler হলো সেন্ট্রাল এরর হ্যান্ডলার। অ্যাপ্লিকেশনের যেকোনো ভ্যালিডেশন এরর বা এক্সেপশন এটি এক জায়গায় ধরে স্ট্যান্ডার্ড ApiError JSON ফরম্যাটে কনভার্ট করে দেয়, ফলে ফ্রন্টএন্ড খুব সহজেই সুন্দর টোস্ট নোটিফিকেশন প্রদর্শন করতে পারে।"
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="viva-box">
+    <div class="viva-q">প্রশ্ন ১০. অ্যাঙ্গুলার HTTP Interceptor-এর কাজ কী?</div>
+    <div class="viva-a"><strong>ইংরেজি কনসেপ্ট:</strong> Clones outgoing HTTP requests and injects the 'Authorization: Bearer <token>' header. Redirects to /login if 401 Unauthorized occurs.</div>
+    <div class="script-box">
+      <span class="viva-speaking-label">ভাইভায় যেভাবে গুছিয়ে বলবেন:</span>
+      "স্যার, AuthInterceptor প্রতিটি আউটগোয়িং HTTP রিকোয়েস্ট ইন্টারসেপ্ট করে স্বয়ংক্রিয়ভাবে Bearer টোকেন যুক্ত করে দেয়। ফলে প্রতিটি সার্ভিসে ম্যানুয়ালি টোকেন পাঠাতে হয় না। টোকেন এক্সপায়ার হয়ে 401 আসলে এটি স্বয়ংক্রিয়ভাবে সেশন ক্লিয়ার করে লগইন পেজে রিডাইরেক্ট করে।"
+    </div>
+  </div>
+
+  <!-- QUESTIONS 11-25 TABLE -->
+  <div class="section-title">
+    <i class="bi bi-list-stars text-primary"></i> প্রশ্ন ১১ থেকে ২৫: সংক্ষিপ্ত প্রশ্নোত্তর ও স্পিকিং রেফারেন্স
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 28%;">ভাইভা প্রশ্ন</th>
+        <th style="width: 32%;">টেকনিক্যাল কনসেপ্ট (English)</th>
+        <th style="width: 40%;">ভাইভায় যেভাবে মুখে বলবেন (Bengali Script)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Q11. JPA Specification কেন?</strong></td>
+        <td>Enables dynamic type-safe Criteria queries.</td>
+        <td>"ডায়নামিক সার্চ ও ফিল্টারের জন্য সেরা, SQL ইনজেকশন ঝুঁকি থাকে না।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q12. HikariCP কী?</strong></td>
+        <td>Default high-performance JDBC pool in Spring.</td>
+        <td>"ডাটাবেস কানেকশন রিইউজ করে লেটেন্সি কমায় ও দ্রুত রেসপন্স দেয়।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q13. DTO-তে Java record কেন?</strong></td>
+        <td>Immutable data carrier with zero boilerplate.</td>
+        <td>"ইমিউটেবল ডাটা ক্যারিয়ার, লম্বক ছাড়াই অটোমেটিক গেটার ও হ্যাশকোড দেয়।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q14. CORS কিভাবে হ্যান্ডেল করেছেন?</strong></td>
+        <td>CorsConfigurationSource in SecurityConfig bean.</td>
+        <td>"SecurityConfig-এ ফ্রন্টএন্ড অরিজিন localhost:4200 এলাউ করা হয়েছে।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q15. ইউজার ইনপুট ভ্যালিডেশন কিভাবে?</strong></td>
+        <td>Jakarta Bean Validation (@Valid, @NotBlank, @Email).</td>
+        <td>"DTO লেয়ারে ভ্যালিডেশন থাকায় ভুল ডাটা কন্ট্রোলারে ঢোকার আগেই রিজেক্ট হয়।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q16. সেলফ-রেফারেন্সিয়াল FK কী?</strong></td>
+        <td>manager_id in users references users.id.</td>
+        <td>"একই users টেবিলের ভেতরেই কর্মী ও ম্যানেজারের টিম কানেকশন রাখা হয়েছে।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q17. open-in-view=true এর কাজ কী?</strong></td>
+        <td>Keeps Hibernate session open during view rendering.</td>
+        <td>"Lazy loading রিলেশন কল করলেও LazyInitializationException হয় না।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q18. RxJS BehaviorSubject কী?</strong></td>
+        <td>Stores current value and emits instantly to new subscribers.</td>
+        <td>"লগইন ও নোটিফিকেশন স্টেট পরিবর্তন হলে সব কম্পোনেন্ট ইনস্ট্যান্ট আপডেট পায়।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q19. পাসওয়ার্ড পরিবর্তন সিকিউরিটি?</strong></td>
+        <td>Verifies current password via BCrypt.matches().</td>
+        <td>"বর্তমান পাসওয়ার্ড সঠিক না হলে সিস্টেম নতুন পাসওয়ার্ড আপডেট করতে দেয় না।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q20. ট্রান্সাকশন রোলব্যাক রুল?</strong></td>
+        <td>@Transactional rolls back on RuntimeException.</td>
+        <td>"মাঝপথে কোনো এরর হলে আগের সব চেঞ্জেস রোলব্যাক হয়ে ডাটাবেস সেফ থাকে।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q21. প্রোফাইল ছবি কিভাবে হ্যান্ডেল করেছেন?</strong></td>
+        <td>Base64 dataURL stored in localStorage with presets.</td>
+        <td>"সার্ভারে চাপ না দিয়ে ব্রাউজারে ইনস্ট্যান্ট ছবি ও প্রিসেট প্রিভিউ কাজ করে।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q22. Angular AuthGuard কী?</strong></td>
+        <td>Implements CanActivate to protect private routes.</td>
+        <td>"লগইন না থাকলে বা সঠিক রোল না থাকলে প্রাইভেট পেজের এক্সেস আটকে দেয়।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q23. SessionService কেন আলাদা?</strong></td>
+        <td>Avoids circular dependency with AuthInterceptor.</td>
+        <td>"ইন্টারসেপ্টর যাতে সার্কুলার ডিপেন্ডেন্সি ছাড়াই টোকেন রিড করতে পারে।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q24. ড্যাশবোর্ড কাউন্ট ফিল্টারিং?</strong></td>
+        <td>Switches on caller role in DashboardService.stats().</td>
+        <td>"অ্যাডমিন সব দেখে, ম্যানেজার তার টিম দেখে, আর এমপ্লয়ি শুধু নিজের টাস্ক দেখে।"</td>
+      </tr>
+      <tr>
+        <td><strong>Q25. ডাটাবেস ইঞ্জিন কোনটি?</strong></td>
+        <td>MySQL 8.0 with InnoDB engine.</td>
+        <td>"InnoDB ইঞ্জিন ব্যবহার করেছি যা ACID কমপ্লায়েন্স ও ফরেন কী সাপোর্ট নিশ্চিত করে।"</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-text">
+    TaskFlow Enterprise Suite &copy; 2026. Confidential Codebase Deep-Dive &amp; Viva Defense Guide.
+  </div>
+
+</body>
+</html>

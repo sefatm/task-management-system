@@ -1,0 +1,57 @@
+<!-- Unified Application Layout (Permanent single router-outlet, never destroyed) -->
+<div class="app-layout" 
+     [class.sidebar-collapsed]="layout.isCollapsed" 
+     [class.guest-layout]="!session.isLoggedIn()">
+
+  <!-- Left Side Navigation (Visible only when authenticated) -->
+  <app-sidebar *ngIf="session.isLoggedIn()"></app-sidebar>
+
+  <!-- Main View Area (Header + Single Router Outlet + Footer) -->
+  <div class="app-main-wrapper" [class.guest-main]="!session.isLoggedIn()">
+    <!-- Top Header Bar (Visible only when authenticated) -->
+    <app-navbar *ngIf="session.isLoggedIn()"></app-navbar>
+
+    <!-- Page Body: The SINGLE permanent Router Outlet -->
+    <main class="app-page-body" 
+          [class.auth-body]="session.isLoggedIn()" 
+          [class.guest-body]="!session.isLoggedIn()">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Enterprise App Footer (Visible only when authenticated) -->
+    <footer class="app-footer border-top py-3 px-3 px-lg-4 mt-auto" *ngIf="session.isLoggedIn()">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 text-muted small">
+          <span class="fw-bold text-main">TaskFlow</span>
+          <span>&copy; {{ currentYear }} Enterprise Suite. All rights reserved.</span>
+        </div>
+        <div class="d-flex align-items-center gap-3 text-muted small">
+          <span class="d-inline-flex align-items-center gap-1 text-success">
+            <span class="status-indicator"></span> System Active
+          </span>
+          <span class="d-none d-sm-inline">Spring Boot 3 + Angular 13</span>
+          <span class="badge bg-light text-secondary border">v1.0.0</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Global Toast Notifications Stack -->
+<div class="toast-stack" aria-live="polite">
+  <div *ngFor="let t of toast.toasts$ | async" 
+       class="toast-item shadow-lg" 
+       [ngClass]="t.type === 'danger' ? 'toast-danger' : 'toast-success'" 
+       role="alert">
+    <div class="toast-icon">
+      <i class="bi" [ngClass]="t.type === 'danger' ? 'bi-exclamation-triangle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+    </div>
+    <div class="toast-content flex-grow-1">
+      <div class="toast-title fw-bold" style="font-size: 0.8rem;" [ngClass]="t.type === 'danger' ? 'text-danger' : 'text-success'">
+        {{ t.type === 'danger' ? 'Attention' : 'Success' }}
+      </div>
+      <div class="toast-msg text-secondary" style="font-size: 0.85rem;">{{ t.message }}</div>
+    </div>
+    <button type="button" class="btn-close ms-2" aria-label="Dismiss" (click)="toast.dismiss(t.id)"></button>
+  </div>
+</div>

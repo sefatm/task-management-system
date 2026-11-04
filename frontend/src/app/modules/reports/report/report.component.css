@@ -1,0 +1,143 @@
+/* ==========================================================================
+   Executive Audit Reports & Live Manual Data Table
+   ========================================================================== */
+
+/* Welcome Banner */
+.welcome-banner {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  background-image: 
+    radial-gradient(circle at 100% 0%, rgba(2, 132, 199, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(99, 102, 241, 0.03) 0%, transparent 40%);
+}
+
+.welcome-heading {
+  color: #0f172a;
+  font-size: 1.85rem;
+  letter-spacing: -0.025em;
+}
+
+.welcome-subtext {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* KPI Summary Cards */
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #0f172a;
+}
+
+.stat-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.icon-blue {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.icon-purple {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.icon-green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.icon-amber {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.progress-stat {
+  height: 6px;
+  border-radius: 6px;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+/* Audit Table */
+.audit-report-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-dark-header tr th {
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.85rem 1rem;
+  border: none;
+}
+
+.audit-report-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.audit-report-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.audit-report-table tbody td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Avatar Small Circle */
+.avatar-sm-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.x-small {
+  font-size: 0.725rem;
+}
