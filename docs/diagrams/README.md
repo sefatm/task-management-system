@@ -1,6 +1,6 @@
 # Architecture & UML Design Diagrams
 
-This directory contains the UML and Database design diagrams required by Section 8 of `INTERVIEW DEMO PROJECT.pdf`:
+This directory contains the UML and Database design diagrams
 
 ---
 
