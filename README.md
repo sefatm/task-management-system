@@ -7,7 +7,7 @@ task-management-system/
 ├── backend/          Spring Boot 3.2 REST API (Java 17, Spring Security + JWT, JPA, MySQL 8)
 ├── frontend/         Angular 13 SPA (Bootstrap 5, route guards, HTTP interceptor, RxJS)
 ├── database/         MySQL 8 schema + seed data (schema.sql)
-├── docs/             UML diagrams (SVG + Mermaid), Postman collection, Presentation & Viva PDFs
+├── docs/             UML diagrams (SVG + Mermaid), Postman collection
 ├── docker-compose.yml Local MySQL 8 database service (auto-loads database/schema.sql)
 └── README.md         Project documentation & setup guide
 ```
